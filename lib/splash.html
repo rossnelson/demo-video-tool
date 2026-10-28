@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:{{width}}px;height:{{height}}px;overflow:hidden;background:{{theme.bg}};font-family:Inter,ui-sans-serif,system-ui,-apple-system,"SF Pro Display",sans-serif}
+svg{position:absolute;inset:0;width:{{width}}px;height:{{height}}px}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transform:translateX(-70px)}
+.row{display:flex;gap:24px}
+.row:empty{display:none}
+.key{display:flex;align-items:center;justify-content:center;min-width:104px;height:104px;padding:0 20px;border-radius:24px;background:#fff;color:#141414;font-size:52px;font-weight:700;box-shadow:0 9px 0 #c9c9d6,0 24px 48px rgba(0,0,0,.4)}
+.key.k1{transform:rotate(-3deg)}
+.key.k2{transform:rotate(4deg) translateY(-4px)}
+.key.k3{transform:rotate(-2deg) translateY(2px)}
+h1{margin:6px 0 0;font-size:84px;line-height:1;color:{{theme.text}};font-weight:700;letter-spacing:-.025em}
+p{margin:0;font-size:30px;color:{{theme.muted}}}
+p:empty{display:none}
+.chips{display:flex;gap:12px;margin-top:10px}
+.chips:empty{display:none}
+.chip{padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:#e9e8ff;font-size:20px;background:rgba(255,255,255,.06)}
+.chip b{color:{{theme.spark}};font-weight:600}
+</style></head><body>
+<svg viewBox="0 0 1600 900" preserveAspectRatio="none">
+  <polygon points="0,0 1600,0 1600,900 0,900" fill="{{theme.bg}}"/>
+  <polygon points="-100,0 1560,0 1360,900 -300,900" fill="{{theme.accent}}"/>
+  <polygon points="-200,0 1470,0 1270,900 -400,900" fill="{{theme.deep}}"/>
+  <circle cx="1210" cy="150" r="7" fill="{{theme.spark}}"/><circle cx="1262" cy="196" r="3.5" fill="{{theme.spark2}}"/>
+  <circle cx="250" cy="720" r="6" fill="{{theme.spark}}"/><circle cx="196" cy="764" r="11" fill="none" stroke="{{theme.spark2}}" stroke-width="3.5"/>
+  <circle cx="1120" cy="770" r="4" fill="{{theme.spark2}}"/>
+  <path d="M110 136 h140 M110 160 h92" stroke="{{theme.accent}}" stroke-width="7" stroke-linecap="round"/>
+  <path d="M1040 724 h140 M1088 748 h92" stroke="{{theme.spark}}" stroke-width="7" stroke-linecap="round"/>
+</svg>
+<div class="card">
+  <div class="row">{{keys}}</div>
+  <h1>{{title}}</h1>
+  <p>{{subtitle}}</p>
+  <div class="chips">
+    {{chips}}
+  </div>
+</div>
+</body></html>

@@ -1,7 +1,11 @@
-import { createRequire } from 'node:module';
-const require = createRequire(`${process.env.CLOUD_UI_DIR ?? `${process.env.HOME}/code/cloud-ui/dev-palette`}/package.json`);
-const { chromium } = require('@playwright/test');
-const ctx = await chromium.launchPersistentContext(process.env.PROFILE_DIR ?? new URL('../.profile', import.meta.url).pathname, { headless: true });
+// Terminates the demo workflow through the palette, if a recording stopped early.
+//   node terminate.mjs <workflow url>
+import { loadProject } from '../../lib/project.mjs';
+import { playwright } from '../../lib/playwright.mjs';
+
+const project = await loadProject(new URL('.', import.meta.url).pathname);
+const { chromium } = playwright();
+const ctx = await chromium.launchPersistentContext(project.browser.profile, { headless: true });
 const page = ctx.pages()[0] ?? (await ctx.newPage());
 const dialog = page.locator('dialog[open]');
 await page.goto(process.argv[2], { timeout: 120000 });

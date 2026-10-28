@@ -1,10 +1,26 @@
+"""Mixes the narration and the music, and writes build/<name>.mp4 with the
+recorded frames.   assemble.py <project-dir>   (after record)
+"""
+import json
 import os
-import json, subprocess, sys
+import subprocess
+import sys
 
-data = json.load(open('frames.json'))
+from project import load, read_json
+
+project, build = load()
+os.chdir(build)
+data = read_json(build, 'frames.json')
+plan = read_json(build, 'plan.json')
 frames, timeline, end = data['frames'], data['timeline'], data['end']
+if not frames:
+    sys.exit('frames.json has no frames')
 pauses = [p for p in data.get('pauses', []) if 'end' in p]
 t0 = data.get('recStart') or frames[0]['t']
+V, MIX, MUSIC = project['video'], project['mix'], project['music']
+if not MUSIC['path']:
+    sys.exit('No music track: set music.path in project.mjs or $MUSIC')
+output = f"{project['name']}.mp4"
 
 # Real time to video time, with the paused stretches cut out.
 def vt(t):
@@ -24,22 +40,19 @@ def loudness(path):
     summary = out[out.rindex('Integrated loudness'):]
     return float(summary.split('I:')[1].split('LUFS')[0])
 
-VOICE_LUFS, MUSIC_LUFS = -16.0, -27.0
-MUSIC = os.environ.get('MUSIC', os.path.expanduser('~/Downloads/above-the-next-wave.mp3'))
-plan = json.load(open('plan.json'))
 inputs, filters, labels = [], [], []
 for i, seg in enumerate(timeline):
     path = f"audio/{seg['name']}.mp3"
     inputs += ['-i', path]
-    gain = VOICE_LUFS - loudness(path)
+    gain = min(MIX['voiceLufs'] - loudness(path), 30)   # silent dry-run clips stay silent
     delay = int(round((vt(seg['start']) + 0.1) * 1000))
     # Every input runs the full length, so amix never re-weights when one ends.
     filters.append(f"[{i}:a]aformat=channel_layouts=stereo,volume={gain:.2f}dB,adelay={delay}|{delay},apad=whole_dur={total:.3f},atrim=end={total:.3f}[a{i}]")
     labels.append(f"[a{i}]")
 m = len(timeline)
-inputs += ['-i', MUSIC]
-music_gain = MUSIC_LUFS - loudness(MUSIC)
-fade_len = plan['bar'] * 2
+inputs += ['-i', MUSIC['path']]
+music_gain = MIX['musicLufs'] - loudness(MUSIC['path'])
+fade_len = plan['bar'] * MUSIC['fadeBars']
 filters.append(f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0:duration=longest,apad=whole_dur={total:.3f},atrim=end={total:.3f},asplit=3[voice][key][voicestem]")
 filters.append(f"[{m}:a]aformat=channel_layouts=stereo,atrim=start={plan['musicOffset']:.3f},asetpts=PTS-STARTPTS,atrim=end={total:.3f},volume={music_gain:.2f}dB,afade=t=out:st={total - fade_len:.3f}:d={fade_len:.3f}[bed]")
 filters.append("[bed][key]sidechaincompress=threshold=0.02:ratio=4:attack=30:release=500:makeup=1,asplit=2[ducked][bedstem]")
@@ -50,13 +63,14 @@ def run(cmd):
     if r.returncode:
         print(r.stderr[-1500:]); sys.exit(r.returncode)
 
+bg = '0x' + V['background'].lstrip('#')
 print(f'{len(frames)} frames, {total:.1f}s, {len(timeline)} narration clips + music bed')
 run(['ffmpeg', '-v', 'error', '-y', *inputs, '-filter_complex', ';'.join(filters),
      '-map', '[mix]', '-c:a', 'pcm_s16le', 'stem-mix.wav',
      '-map', '[voicestem]', '-c:a', 'pcm_s16le', 'stem-voice.wav',
      '-map', '[bedstem]', '-c:a', 'pcm_s16le', 'stem-bed.wav'])
 run(['ffmpeg', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'frames.txt', '-i', 'stem-mix.wav',
-     '-filter_complex', f"[0:v]scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x0b0b14,fps=30,format=yuv420p,fade=t=out:st={total - 1.0:.3f}:d=1.0[vout]",
+     '-filter_complex', f"[0:v]scale={V['width']}:{V['height']}:force_original_aspect_ratio=decrease:flags=lanczos,pad={V['width']}:{V['height']}:(ow-iw)/2:(oh-ih)/2:color={bg},fps={V['fps']},format=yuv420p,fade=t=out:st={total - 1.0:.3f}:d=1.0[vout]",
      '-map', '[vout]', '-map', '1:a', '-t', f'{total:.3f}', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18',
-     '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', 'command-palette-demo.mp4'])
-print('ok')
+     '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', output])
+print('wrote', os.path.join(build, output))

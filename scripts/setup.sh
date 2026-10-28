@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cloud environment setup for command-palette-video.
+# Cloud environment setup for the demo video tool.
 #
 # Claude Code runs the environment's setup script one directory above the
 # repository checkout, once per new session, with no access to the
@@ -48,16 +48,12 @@ PY
 say "Node: Playwright"
 # The image ships Playwright and a matching Chromium under /opt/pw-browsers.
 # Never run "playwright install" or add playwright to package.json: a second
-# copy would look for a browser build that is not there.
+# copy would look for a browser build that is not there. lib/playwright.mjs
+# finds this copy; elsewhere set PLAYWRIGHT_DIR to a checkout that has one.
 node -e '
   const pw = require("playwright");
   console.log(`  node ${process.version}, playwright ${require("playwright/package.json").version}, chromium ${pw.chromium.executablePath()}`);
 '
-if [ -f package.json ]; then
-  if [ -f package-lock.json ]; then npm ci --no-audit --no-fund --silent
-  else npm install --no-audit --no-fund --silent; fi
-  echo "  npm dependencies installed"
-fi
 
 # ------------------------------------------------------------------ inputs
 say "Session inputs (set in the environment's variables / secrets)"
@@ -65,10 +61,8 @@ check_var() {  # name, purpose
   if [ -n "${!1:-}" ]; then printf '  %-20s set\n' "$1"
   else printf '  %-20s unset  (%s)\n' "$1" "$2"; fi
 }
-check_var ELEVENLABS_API_KEY "narrate.py needs it, or write the key to .el-key"
-check_var MUSIC              "assemble.py and beats.py need a path to the music track"
-check_var CLOUD_UI_DIR       "record.mjs and splash/render.mjs still load Playwright from here"
-check_var BASE_URL           "record.mjs defaults to http://localhost:3000"
-check_var NAMESPACE          "record.mjs defaults to abcabc.temporal-dev"
+check_var ELEVENLABS_API_KEY "demo narrate needs it, or write the key to .el-key; --dry works without"
+check_var MUSIC              "overrides music.path in a project's project.mjs"
+# A project may read more (projects/command-palette uses BASE_URL and NAMESPACE).
 
-say "Ready. Recording needs a running Cloud UI; everything else runs here."
+say "Ready: bin/demo <command> <project-dir>. Try: bin/demo all projects/example --dry"

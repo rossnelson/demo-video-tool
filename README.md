@@ -1,37 +1,113 @@
-# Command palette intro video
+# Demo video tool
 
-These scripts make the command palette intro video and its splash image. The video is a screen recording of Cloud UI with ElevenLabs narration, SVG transitions and a music bed. The cuts fall on the music's downbeats.
+Makes a narrated product video from a browser: a screen recording with ElevenLabs narration, SVG transition cards and a music bed. The cuts fall on the music's downbeats. A video is a *project*: one directory with a `project.mjs` that holds the narration, the cards and the on-screen actions, plus whatever page or app it records.
+
+`projects/command-palette/` is the Temporal Cloud command palette intro. `projects/example/` records a small local page and is the template for new projects.
 
 ## What you need
 
-- A Cloud UI checkout with the palette. The scripts load Playwright from it. Set `CLOUD_UI_DIR` if it is not at `~/code/cloud-ui/dev-palette`.
-- Cloud UI running at `http://localhost:3000`, or set `BASE_URL`.
-- A Chrome profile that is signed in to that Cloud UI. The recorder uses `.profile/`, or set `PROFILE_DIR`. On the first run, sign in to the window that opens.
-- A namespace to record in. Set `NAMESPACE`.
-- An ElevenLabs API key in `ELEVENLABS_API_KEY`, or in `.el-key` (git ignores it).
-- The music track. Set `MUSIC`, or put it at `~/Downloads/above-the-next-wave.mp3`.
-- `ffmpeg`, `ffprobe`, Node and Python 3. Install the beat tracker with `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`.
+- `ffmpeg`, `ffprobe`, Node 20+ and Python 3.
+- Playwright with Chromium. The cloud image has it; elsewhere `npm install -g playwright && npx playwright install chromium`, or set `PLAYWRIGHT_DIR` to a checkout that has it.
+- The beat tracker: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`.
+- An ElevenLabs API key in `ELEVENLABS_API_KEY`, or in `.el-key` (git ignores it). Not needed for `--dry` runs.
+- A music track: `music.path` in the project, or `MUSIC`.
+- On a server with no display, `xvfb` for recording (`bin/demo record` uses it when `DISPLAY` is unset).
 
-## Make the video
+`scripts/setup.sh` installs all of this in a Claude Code cloud environment.
 
-Run these from `video/`:
+## Make a video
 
-1. Edit the narration in `lines.json`. Each entry is `[clip name, text]`.
-2. `python3 narrate.py` makes `audio/<clip>.mp3` with ElevenLabs and writes `durations.json`.
-3. `../.venv/bin/python beats.py "$MUSIC"` finds the beats and downbeats and writes `beats.json`.
-4. `python3 plan.py` puts each clip on the downbeats and writes `plan.json`.
-5. `node record.mjs > record.log` records the screen. `overlay.js` draws the transitions and key hints in the page. The log shows when each scene ends against the plan. "late: none" means every cut lands on its downbeat.
-6. `python3 assemble.py` mixes the narration and the music, and writes `command-palette-demo.mp4`.
-7. `python3 check_audio.py` measures the loudness of each narration window in the video.
+```
+bin/demo new projects/my-video        # copy of projects/example
+$EDITOR projects/my-video/project.mjs
 
-The recorder starts a demo workflow for the workflow scenes. If a run stops early, `node terminate.mjs` terminates it.
+bin/demo narrate  projects/my-video   # ElevenLabs -> build/audio, build/durations.json
+bin/demo beats    projects/my-video   # beats and downbeats -> build/beats.json
+bin/demo plan     projects/my-video   # scenes on the downbeats -> build/plan.json
+bin/demo record   projects/my-video   # -> build/frames, build/record.log
+bin/demo assemble projects/my-video   # -> build/<name>.mp4
+bin/demo check    projects/my-video   # loudness of each narration window
+bin/demo splash   projects/my-video   # -> build/<name>-splash.png
+```
 
-## Make the splash image
+`bin/demo build <project>` runs plan, record, assemble and check. `bin/demo all <project>` runs everything. Everything lands in the project's `build/` directory, which git ignores.
 
-Run `node splash/render.mjs`. It renders `splash/splash.html` to `splash/command-palette-splash.png`.
+Useful while writing:
 
-## Settings
+- `bin/demo narrate <project> --dry` makes silent clips of an estimated length, so you can plan and record without spending ElevenLabs credits.
+- `bin/demo narrate <project> 03-page 04-paste` regenerates only those clips.
+- `bin/demo show <project>` prints the project with every default filled in.
+- `build/record.log` shows when each scene ended against the plan. `late: none` means every cut landed on its downbeat.
 
-- Voice: ElevenLabs `cBTYF7NiJbR8Bvmdeuse`. Set `VOICE_ID` to use another voice.
-- Model: `eleven_multilingual_v2`, with stability 0.45, similarity 0.8, style 0.35 and speaker boost on.
-- Mix: each narration clip at -16 LUFS, and the music at -27 LUFS. The music ducks under the voice and fades over the last two bars.
+## A project
+
+`project.mjs` exports one object. Everything but `scenes` is optional; `bin/demo show` prints the defaults.
+
+```js
+export default {
+  name: 'notes-demo',                 // output file names
+  title: 'Notes',                     // intro and outro cards, and the splash
+  subtitle: 'A tiny to-do list',
+  keys: ['⌘', 'K'],                   // key caps on the cards and the splash; [] for none
+  theme: { bg, accent, deep, spark, spark2, text, muted, step },   // colours
+  voice: { id, model, format, settings },                           // ElevenLabs
+  music: { path, leadIn, firstDownbeatAt, fadeBars },
+  mix: { voiceLufs: -16, musicLufs: -27 },
+  timing: { cardBeats: 8, holdBeats: 4, gap: 0.6, introGap: 0.4, outroBars: 3 },
+  video: { width: 1920, height: 1080, fps: 30, background, quality },
+  browser: { viewport, deviceScaleFactor, colorScheme, permissions, profile, headless },
+  splash: { width, height, scale, chips: [{ key: '↵', label: 'run' }], file },
+
+  async setup(api) {},                // before recording: sign in, seed data, open the first page
+  async teardown(api) {},             // after recording
+  async clear(api) {},                // before each scene, before a cut, and 0.7 s before a scene ends
+
+  scenes: [
+    { name: '00-intro', kind: 'intro', narration: '…' },
+    {
+      name: '01-add', step: '01', title: 'Add a note', subtitle: 'Type it and press Enter',
+      narration: 'Type what needs doing and press Enter.',
+      before: ({ cut }) => cut('http://localhost:3000/notes'),   // off camera
+      async run({ page, type, press }) {                          // while the narration plays
+        await page.locator('#text').click();
+        await type('Record the demo');
+        await press('Enter', '↵');
+      },
+      after: (api) => {},                                         // off camera
+    },
+    { name: '02-outro', kind: 'outro', subtitle: 'Try it today', narration: '…' },
+  ],
+};
+```
+
+Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. `card: false` skips a scene's card.
+
+Hooks and actions get one `api` object:
+
+| Member | What it does |
+| --- | --- |
+| `page`, `ctx`, `cdp` | the Playwright page and context, and a CDP session |
+| `wait(ms)` | pause |
+| `keys(label)` | show a key hint at the bottom of the page |
+| `press(key, label, pauseMs)` | show the hint, press the key, pause |
+| `type(text, pauseMs)` | type with a human delay |
+| `settle(url)` | open a page and wait for it to go quiet |
+| `cut(url)` | navigate off camera |
+| `offCamera(fn)` | run `fn` with the recording paused |
+| `emulate({ width, height })`, `emulate(null)` | phone metrics and touch, off camera; `null` puts them back |
+| `pause()`, `resume()`, `vnow()` | the recording, and the video time |
+| `project`, `plan`, `beat`, `bar`, `env`, `log` | the project, the plan, beat and bar in ms, `process.env`, a logger |
+
+Browser profile: `browser.profile` (default `.profile/` in the project, or `PROFILE_DIR`) is a persistent Chrome profile, so sign-ins survive between runs. Set it to `null` for a fresh context each run.
+
+Splash: `lib/splash.html` is the default page. It takes `{{title}}`, `{{subtitle}}`, `{{keys}}`, `{{chips}}`, `{{width}}`, `{{height}}` and `{{theme.bg}}` and the other colours. A project can point `splash.file` at its own page.
+
+## The command palette project
+
+Records Cloud UI. Set `BASE_URL` (default `http://localhost:3000`) and `NAMESPACE`, and sign in to the window on the first run. The recorder starts a demo workflow for the workflow scenes; if a run stops early, `node projects/command-palette/terminate.mjs <workflow url>` terminates it. Music: `~/Downloads/above-the-next-wave.mp3`, or `MUSIC`.
+
+## Settings carried over
+
+- Voice: ElevenLabs `cBTYF7NiJbR8Bvmdeuse`, model `eleven_multilingual_v2`, stability 0.45, similarity 0.8, style 0.35, speaker boost on. `VOICE_ID` overrides the voice.
+- Mix: each narration clip at -16 LUFS, the music at -27 LUFS. The music ducks under the voice and fades over the last two bars.
+- `el.sh <endpoint>` calls the ElevenLabs API with your key, for looking up voices or usage.

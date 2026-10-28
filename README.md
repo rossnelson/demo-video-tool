@@ -50,7 +50,7 @@ A theme owns the look: the scene cards, the end card, the key hint and the splas
 - **poster**: huge uppercase type and flat colour blocks that snap in on the beats. Launches.
 - **temporal**: the temporal.io brand system. A band of timeline rows, drawn like the Temporal UI's timeline graph, crawls across and drags each card on and off screen. Space Black, Off White, UV and mono labels.
 
-Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`. A theme may offer options: the temporal theme has three wipes, chosen with `theme: { name: 'temporal', options: { wipe: 'fail' } }` (`crawl`, `fail`, `rail`, or `cycle` to rotate), and any scene can pick its own with `card: { wipe: 'rail' }`.
+Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`. A theme may offer options: the temporal theme has four wipes, chosen with `theme: { name: 'temporal', options: { wipe: 'fail' } }` (`crawl`, `fail`, `signal`, `rail`, or `cycle` to rotate), and any scene can pick its own with `card: { wipe: 'rail' }`.
 
 `bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
 

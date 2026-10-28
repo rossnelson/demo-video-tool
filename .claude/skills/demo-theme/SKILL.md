@@ -18,7 +18,7 @@ with `theme: './my-theme'` in its `project.mjs`.
 
 | File | What it is |
 | --- | --- |
-| `theme.mjs` | Default export: `{ name, description, colors: {…}, fonts: {…}, pad }`. `colors` and `fonts` are free-form token maps the other two files read. `pad` is the colour behind the video frames when they do not fill 16:9. A project may override `colors`, `fonts` and `pad`; nothing else. |
+| `theme.mjs` | Default export: `{ name, description, colors: {…}, fonts: {…}, pad, options: {…} }`. `colors` and `fonts` are free-form token maps the other two files read. `pad` is the colour behind the video frames when they do not fill 16:9. `options` are the theme's own switches, such as which wipe it uses. A project may override `colors`, `fonts`, `pad` and `options`; nothing else. |
 | `card.js` | A plain script injected into every recorded page. It must define `window.__demo` with `transition`, `end` and `keys` (contract below). It reads `window.__demoConfig`: `{ beat, keys, theme }`, where `beat` is one beat in ms, `keys` the project's key cap glyphs (an array, possibly empty) and `theme` the tokens from `theme.mjs`. |
 | `splash.html` | A static page for the splash image. Placeholders: `{{title}}`, `{{subtitle}}`, `{{url}}`, `{{keys}}` (rendered `<span class="key kN">` elements), `{{chips}}` (`<span class="chip"><b>key</b> label</span>` elements), `{{width}}`, `{{height}}`, and every token as `{{colors.name}}` or `{{fonts.name}}`. |
 
@@ -26,11 +26,20 @@ with `theme: './my-theme'` in its `project.mjs`.
 
 ```js
 window.__demo = {
-  transition(step, title, subtitle, holdMs) { … return totalMs; },
-  end({ title, subtitle, url, lines }, holdMs) { … return totalMs; },
+  transition(step, title, subtitle, holdMs, opts) { … return totalMs; },
+  end({ title, subtitle, url, lines }, holdMs, opts) { … return totalMs; },
   keys(label) { … },
 };
 ```
+
+`opts` is `{ index, …sceneOptions }`: the scene's position in the video and
+whatever the scene set in `card: { … }`. A theme that offers variations
+(say, several wipes) reads its default from `window.__demoConfig.theme.options`
+(set in `theme.mjs`, overridable by a project with
+`theme: { name, options: { … } }`), lets a scene override it through `opts`,
+and can use `index` to rotate through variations. Document the options at
+the top of `theme.mjs`. `bin/demo theme <name>` previews with
+`WIPE=<variation>` in the environment for themes that use that option name.
 
 - **`transition`** draws a scene card. The timing envelope is fixed by
   `lib/plan.py`: the card comes in over **2 beats**, holds for **`holdMs`**,

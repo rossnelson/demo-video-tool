@@ -48,9 +48,9 @@ A theme owns the look: the scene cards, the end card, the key hint and the splas
 - **paper**: cream, serif, hairlines, a slow fade. Documentation and tutorials.
 - **terminal**: a dark terminal window types the title at a prompt. CLIs and developer tools.
 - **poster**: huge uppercase type and flat colour blocks that snap in on the beats. Launches.
-- **temporal**: the temporal.io brand system. A time rail sweeps in to reveal a light title over an event history drawn like the Temporal UI's timeline graph, with Space Black, Off White, UV and mono labels.
+- **temporal**: the temporal.io brand system. A band of timeline rows, drawn like the Temporal UI's timeline graph, crawls across and drags each card on and off screen. Space Black, Off White, UV and mono labels.
 
-Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`.
+Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`. A theme may offer options: the temporal theme has three wipes, chosen with `theme: { name: 'temporal', options: { wipe: 'fail' } }` (`crawl`, `fail`, `rail`, or `cycle` to rotate), and any scene can pick its own with `card: { wipe: 'rail' }`.
 
 `bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
 
@@ -97,7 +97,7 @@ export default {
 };
 ```
 
-Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card.
+Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card; `card: { … }` passes options to the theme for that card.
 
 Hooks and actions get one `api` object:
 

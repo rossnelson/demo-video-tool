@@ -48,7 +48,7 @@ A theme owns the look: the scene cards, the end card, the key hint and the splas
 - **paper**: cream, serif, hairlines, a slow fade. Documentation and tutorials.
 - **terminal**: a dark terminal window types the title at a prompt. CLIs and developer tools.
 - **poster**: huge uppercase type and flat colour blocks that snap in on the beats. Launches.
-- **temporal**: the temporal.io brand system. Space Black, Off White and UV, a light title over a perspective grid and a violet glow, mono labels.
+- **temporal**: the temporal.io brand system. A time rail sweeps in to reveal a light title over an event history drawn like the Temporal UI's timeline graph, with Space Black, Off White, UV and mono labels.
 
 Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`.
 

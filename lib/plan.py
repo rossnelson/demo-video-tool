@@ -33,7 +33,9 @@ for i, scene in enumerate(scenes):
         # The card holds while the narration plays. Narration starts one bar in.
         narration = start + BAR
         end = next_downbeat(narration + dur + T['introGap'] + 2 * BEAT)
-        hold = (end - start) - T['holdBeats'] * BEAT
+        # The card leaves just before the scene ends: its in and out beats
+        # (cardBeats minus holdBeats) are what it needs, whatever the hold is.
+        hold = (end - start) - (T['cardBeats'] - T['holdBeats']) * BEAT
     elif kind == 'outro':
         narration = start + BAR
         end_card_follows = i + 1 < len(scenes) and scenes[i + 1]['kind'] == 'end'

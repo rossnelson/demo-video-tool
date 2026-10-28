@@ -66,6 +66,12 @@ window.__demo = {
   such as a typed line, must shrink instead.
 - Do not depend on web fonts being installed. Name a font stack and let
   it fall back.
+- **Keep filters small.** A `filter: blur()` over the whole frame can take
+  over a second to paint without a GPU, and every CSS animation in the
+  card waits for that first paint, so the whole card runs late against
+  the music. Blur a text block or a small decoration, never the full
+  stage; move large elements with `transform` and `opacity`, which the
+  compositor handles. A static blurred glow is fine: it paints once.
 
 ## Workflow
 

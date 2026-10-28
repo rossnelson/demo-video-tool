@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:{{width}}px;height:{{height}}px;overflow:hidden;background:{{colors.bg}};font-family:{{fonts.display}};color:{{colors.text}}}
+.block{position:absolute;top:0;bottom:0;left:58%;right:0;background:{{colors.block}}}
+.band{position:absolute;left:0;right:0;bottom:0;height:130px;background:{{colors.band}}}
+.row{position:absolute;left:80px;top:70px;display:flex;gap:12px}
+.key{display:flex;align-items:center;justify-content:center;min-width:92px;height:92px;padding:0 18px;background:{{colors.block}};color:{{colors.onBlock}};font-size:46px}
+h1{position:absolute;left:80px;top:50%;transform:translateY(-60%);margin:0;max-width:800px;font-size:136px;line-height:.9;text-transform:uppercase;letter-spacing:-.03em}
+p{position:absolute;left:80px;right:80px;bottom:0;height:130px;display:flex;align-items:center;margin:0;font-family:{{fonts.sans}};font-weight:700;font-size:34px;letter-spacing:.06em;text-transform:uppercase;color:{{colors.onBand}}}
+.chips{position:absolute;right:60px;bottom:170px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:{{fonts.sans}};font-weight:600;font-size:28px;color:{{colors.onBlock}}}
+.chip b{font-weight:900}
+</style></head><body>
+<div class="block"></div><div class="band"></div>
+<div class="row">{{keys}}</div>
+<h1>{{title}}</h1>
+<div class="chips">
+  {{chips}}
+</div>
+<p>{{subtitle}}</p>
+</body></html>

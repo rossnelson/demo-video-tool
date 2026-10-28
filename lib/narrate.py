@@ -64,6 +64,8 @@ known = dict(json.load(open(durations_path))) if os.path.exists(durations_path) 
 durs = []
 for scene in project['scenes']:
     name, text = scene['name'], scene['narration']
+    if not text:
+        continue   # a silent end card
     out = os.path.join(audio, f'{name}.mp3')
     if only and name not in only and name in known and os.path.exists(out):
         durs.append([name, known[name]])

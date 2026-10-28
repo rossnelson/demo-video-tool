@@ -39,6 +39,20 @@ Useful while writing:
 - `bin/demo show <project>` prints the project with every default filled in.
 - `build/record.log` shows when each scene ended against the plan. `late: none` means every cut landed on its downbeat.
 
+## Themes
+
+A theme owns the look: the scene cards, the end card, the key hint and the splash. The engine owns the timing. `bin/demo themes` lists the built-in ones:
+
+- **slant**: diagonal colour bars wipe in, key caps pop. Dark and energetic; the original look.
+- **minimal**: a white card, one accent rule. Quiet; fits anything.
+- **paper**: cream, serif, hairlines, a slow fade. Documentation and tutorials.
+- **terminal**: a dark terminal window types the title at a prompt. CLIs and developer tools.
+- **poster**: huge uppercase type and flat colour blocks that snap in on the beats. Launches.
+
+Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`.
+
+`bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
+
 ## A project
 
 `project.mjs` exports one object. Everything but `scenes` is optional; `bin/demo show` prints the defaults.
@@ -46,15 +60,16 @@ Useful while writing:
 ```js
 export default {
   name: 'notes-demo',                 // output file names
-  title: 'Notes',                     // intro and outro cards, and the splash
+  title: 'Notes',                     // intro, outro and end cards, and the splash
   subtitle: 'A tiny to-do list',
+  url: 'notes.example.com',           // on the end card
   keys: ['⌘', 'K'],                   // key caps on the cards and the splash; [] for none
-  theme: { bg, accent, deep, spark, spark2, text, muted, step },   // colours
+  theme: 'slant',                     // or { name, colors, fonts, pad } or './my-theme'
   voice: { id, model, format, settings },                           // ElevenLabs
   music: { path, leadIn, firstDownbeatAt, fadeBars },
   mix: { voiceLufs: -16, musicLufs: -27 },
-  timing: { cardBeats: 8, holdBeats: 4, gap: 0.6, introGap: 0.4, outroBars: 3 },
-  video: { width: 1920, height: 1080, fps: 30, background, quality },
+  timing: { cardBeats: 8, holdBeats: 4, gap: 0.6, introGap: 0.4, outroBars: 3, endBars: 4 },
+  video: { width: 1920, height: 1080, fps: 30, background, quality },   // background defaults to the theme's pad
   browser: { viewport, deviceScaleFactor, colorScheme, permissions, profile, headless },
   splash: { width, height, scale, chips: [{ key: '↵', label: 'run' }], file },
 
@@ -76,11 +91,12 @@ export default {
       after: (api) => {},                                         // off camera
     },
     { name: '02-outro', kind: 'outro', subtitle: 'Try it today', narration: '…' },
+    { name: '03-end', kind: 'end', lines: ['Free for personal use'] },   // silent; stays to the end
   ],
 };
 ```
 
-Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. `card: false` skips a scene's card.
+Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card.
 
 Hooks and actions get one `api` object:
 
@@ -100,7 +116,7 @@ Hooks and actions get one `api` object:
 
 Browser profile: `browser.profile` (default `.profile/` in the project, or `PROFILE_DIR`) is a persistent Chrome profile, so sign-ins survive between runs. Set it to `null` for a fresh context each run.
 
-Splash: `lib/splash.html` is the default page. It takes `{{title}}`, `{{subtitle}}`, `{{keys}}`, `{{chips}}`, `{{width}}`, `{{height}}` and `{{theme.bg}}` and the other colours. A project can point `splash.file` at its own page.
+Splash: the theme's `splash.html` is the page. It takes `{{title}}`, `{{subtitle}}`, `{{url}}`, `{{keys}}`, `{{chips}}`, `{{width}}`, `{{height}}`, and the theme's tokens as `{{colors.bg}}` or `{{fonts.sans}}`. A project can point `splash.file` at its own page.
 
 ## The command palette project
 

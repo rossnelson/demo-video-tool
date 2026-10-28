@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:{{width}}px;height:{{height}}px;overflow:hidden;background:{{colors.bg}};font-family:{{fonts.mono}};color:{{colors.text}}}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);mix-blend-mode:screen}
+.win{position:absolute;left:50%;top:50%;width:1180px;transform:translate(-50%,-54%);background:{{colors.frame}};border:1px solid {{colors.border}};border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden}
+.bar{display:flex;align-items:center;gap:9px;height:44px;padding:0 18px;border-bottom:1px solid {{colors.border}};color:{{colors.muted}};font-size:15px}
+.bar i{width:13px;height:13px;border-radius:50%;background:#ff5f57}.bar i+i{background:#febc2e}.bar i+i+i{background:#28c840;margin-right:10px}
+.body{padding:40px 48px 48px;background:{{colors.bg}};font-size:48px;line-height:1.35}
+.ps{color:{{colors.prompt}};margin-right:.6em}
+.cur{display:inline-block;width:.55em;height:1.1em;background:{{colors.text}};vertical-align:text-bottom;margin-left:4px}
+.out{color:{{colors.muted}};font-size:28px;margin-top:.4em}
+.out:empty{display:none}
+.row{display:flex;gap:14px;margin-top:28px}
+.row:empty{display:none}
+.key{display:flex;align-items:center;justify-content:center;min-width:64px;height:64px;padding:0 14px;border:1.5px solid {{colors.prompt}};border-radius:9px;color:{{colors.prompt}};font-size:32px}
+.chips{display:flex;gap:28px;margin-top:26px;font-size:22px;color:{{colors.muted}}}
+.chips:empty{display:none}
+.chip b{color:{{colors.accent}};font-weight:600}
+</style></head><body>
+<div class="win">
+  <div class="bar"><i></i><i></i><i></i>demo — zsh</div>
+  <div class="body">
+    <div><span class="ps">~ $</span>{{title}}<span class="cur"></span></div>
+    <div class="out">{{subtitle}}</div>
+    <div class="row">{{keys}}</div>
+    <div class="chips">
+      {{chips}}
+    </div>
+  </div>
+</div>
+<div class="scan"></div>
+</body></html>

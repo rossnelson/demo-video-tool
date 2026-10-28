@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:{{width}}px;height:{{height}}px;overflow:hidden;background:{{colors.bg}};font-family:{{fonts.sans}};color:{{colors.text}}}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center}
+.row{display:flex;gap:18px;margin-bottom:8px}
+.row:empty,p:empty,.chips:empty{display:none}
+.key{display:flex;align-items:center;justify-content:center;min-width:92px;height:92px;padding:0 20px;border-radius:18px;background:{{colors.key}};border:1px solid {{colors.keyEdge}};font-size:44px;font-weight:600}
+h1{margin:0;font-size:92px;line-height:1.05;font-weight:600;letter-spacing:-.03em}
+.rule{width:96px;height:4px;background:{{colors.accent}}}
+p{margin:0;font-size:32px;color:{{colors.muted}}}
+.chips{display:flex;gap:12px;margin-top:12px}
+.chip{padding:8px 16px;border-radius:999px;border:1px solid {{colors.keyEdge}};color:{{colors.muted}};font-size:20px}
+.chip b{color:{{colors.text}};font-weight:600}
+</style></head><body>
+<div class="card">
+  <div class="row">{{keys}}</div>
+  <h1>{{title}}</h1>
+  <div class="rule"></div>
+  <p>{{subtitle}}</p>
+  <div class="chips">
+    {{chips}}
+  </div>
+</div>
+</body></html>

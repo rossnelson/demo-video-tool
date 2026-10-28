@@ -25,6 +25,8 @@ voice, bed, mix = per_second('stem-voice.wav'), per_second('stem-bed.wav'), per_
 print('voice stem per segment (dB inside narration / outside):')
 for n in plan['order']:
     p = plan['segments'][n]
+    if n not in durs:
+        continue
     a, b = int(p['narration'] + 0.5), int(p['narration'] + durs[n] - 0.5)
     inside = max(voice[a:b + 1]) if b >= a and b < len(voice) else None
     after = voice[b + 2] if b + 2 < len(voice) else None

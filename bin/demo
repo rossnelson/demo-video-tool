@@ -15,14 +15,20 @@
 #   splash               render the splash image -> build/<name>-splash.png
 #   build                plan, record, assemble, check
 #   all                  narrate, beats, build, splash
+#   themes               list the themes in lib/themes
+#   theme <name> [project]  preview a theme's cards and splash -> build/themes/<name>/
 set -euo pipefail
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 lib="$root/lib"
 
-usage() { sed -n '2,19p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit "${1:-2}"; }
+usage() { sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit "${1:-2}"; }
 cmd=${1:-}; [ -n "$cmd" ] || usage
 shift
-case $cmd in -h|--help|help) usage 0;; esac
+case $cmd in
+  -h|--help|help) usage 0 ;;
+  themes) exec node "$lib/theme-preview.mjs" --list ;;
+  theme)  [ -n "${1:-}" ] || { echo "demo theme: which theme?" >&2; usage; }; exec node "$lib/theme-preview.mjs" "$@" ;;
+esac
 project=${1:-}; [ -n "$project" ] || { echo "demo $cmd: which project directory?" >&2; usage; }
 shift
 

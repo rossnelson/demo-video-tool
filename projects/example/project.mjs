@@ -8,7 +8,9 @@ export default {
   name: 'notes-demo',                       // build/notes-demo.mp4, build/notes-demo-splash.png
   title: 'Notes',
   subtitle: 'A tiny to-do list',
+  url: 'notes.example.com',                 // on the end card
   keys: ['✓'],                              // key caps on the cards and the splash; [] for none
+  theme: 'slant',                           // bin/demo themes lists them; or './my-theme'; or { name, colors: {…} }
   music: { path: null },                    // a path, or set $MUSIC
   browser: { profile: null, headless: true },
   splash: { chips: [{ key: '↵', label: 'add' }, { key: 'click', label: 'done' }] },
@@ -22,8 +24,9 @@ export default {
   // Each scene: a name, a card (step, title, subtitle), the narration, and
   // run(api) with what to do on screen while the narration plays.
   // api: page, wait, press, type, keys, settle, cut, offCamera, emulate, log …
-  // The first scene is the intro and the last the outro: their cards hold
-  // through the narration, and they take the project's title and subtitle.
+  // kind 'intro' and 'outro' cards hold through their narration and take the
+  // project's title and subtitle. A final kind 'end' card stays to the end
+  // of the video; it may be silent.
   scenes: [
     {
       name: '00-intro', kind: 'intro',
@@ -61,6 +64,10 @@ export default {
     {
       name: '04-outro', kind: 'outro', subtitle: 'Try it today',
       narration: "That's Notes. Add something and mark it done.",
+    },
+    {
+      name: '05-end', kind: 'end',
+      lines: ['Free for personal use', 'Works in any browser'],
     },
   ],
 };

@@ -21,12 +21,13 @@ CARD = T['cardBeats'] * BEAT
 def next_downbeat(t):
     return next(d for d in downbeats if d >= t - 1e-6)
 
+scenes = project['scenes']
 plan, order, t = {}, [], next_downbeat(0.2)
-for scene in project['scenes']:
+for i, scene in enumerate(scenes):
     name, kind = scene['name'], scene['kind']
-    if name not in durations:
+    if scene['narration'] and name not in durations:
         raise SystemExit(f'no narration clip for {name}; run narrate first')
-    dur = durations[name]
+    dur = durations.get(name, 0)
     start = t
     if kind == 'intro':
         # The card holds while the narration plays. Narration starts one bar in.
@@ -35,8 +36,15 @@ for scene in project['scenes']:
         hold = (end - start) - T['holdBeats'] * BEAT
     elif kind == 'outro':
         narration = start + BAR
-        end = next_downbeat(narration + dur + T['outroBars'] * BAR)   # music plays out over the card
-        hold = (end - start) + 4 * BAR                                 # never fades out
+        end_card_follows = i + 1 < len(scenes) and scenes[i + 1]['kind'] == 'end'
+        play_out = BAR if end_card_follows else T['outroBars'] * BAR    # music plays out over the card
+        end = next_downbeat(narration + dur + play_out)
+        hold = (end - start) + 4 * BAR                                   # never fades out
+    elif kind == 'end':
+        # The end card comes in on the downbeat and stays to the end of the video.
+        narration = start + (BAR if dur else 0)
+        end = next_downbeat(max(narration + dur + T['gap'], start + T['endBars'] * BAR))
+        hold = (end - start) + 4 * BAR
     else:
         narration = start + CARD
         end = next_downbeat(narration + dur + T['gap'])

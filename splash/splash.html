@@ -1,0 +1,37 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1600px;height:900px;overflow:hidden;background:#141414;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"SF Pro Display",sans-serif}
+svg{position:absolute;inset:0;width:1600px;height:900px}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transform:translateX(-70px)}
+.row{display:flex;gap:24px}
+.key{display:flex;align-items:center;justify-content:center;min-width:104px;height:104px;padding:0 20px;border-radius:24px;background:#fff;color:#141414;font-size:52px;font-weight:700;box-shadow:0 9px 0 #c9c9d6,0 24px 48px rgba(0,0,0,.4)}
+.key.k2{transform:rotate(4deg) translateY(-4px)}
+.key.k1{transform:rotate(-3deg)}
+h1{margin:6px 0 0;font-size:84px;line-height:1;color:#fff;font-weight:700;letter-spacing:-.025em}
+p{margin:0;font-size:30px;color:#d8d6ff}
+.chips{display:flex;gap:12px;margin-top:10px}
+.chip{padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:#e9e8ff;font-size:20px;background:rgba(255,255,255,.06)}
+.chip b{color:#1ff1a5;font-weight:600}
+</style></head><body>
+<svg viewBox="0 0 1600 900">
+  <polygon points="0,0 1600,0 1600,900 0,900" fill="#141414"/>
+  <polygon points="-100,0 1560,0 1360,900 -300,900" fill="#444ce7"/>
+  <polygon points="-200,0 1470,0 1270,900 -400,900" fill="#1d1b3a"/>
+  <circle cx="1210" cy="150" r="7" fill="#1ff1a5"/><circle cx="1262" cy="196" r="3.5" fill="#f25cb0"/>
+  <circle cx="250" cy="720" r="6" fill="#1ff1a5"/><circle cx="196" cy="764" r="11" fill="none" stroke="#f25cb0" stroke-width="3.5"/>
+  <circle cx="1120" cy="770" r="4" fill="#f25cb0"/>
+  <path d="M110 136 h140 M110 160 h92" stroke="#444ce7" stroke-width="7" stroke-linecap="round"/>
+  <path d="M1040 724 h140 M1088 748 h92" stroke="#1ff1a5" stroke-width="7" stroke-linecap="round"/>
+</svg>
+<div class="card">
+  <div class="row"><span class="key k1">⌘</span><span class="key k2">K</span></div>
+  <h1>Command palette</h1>
+  <p>Everything in Temporal Cloud, one shortcut away</p>
+  <div class="chips">
+    <span class="chip"><b>↵</b> run</span>
+    <span class="chip"><b>⌘K</b> actions</span>
+    <span class="chip"><b>g ␣</b> scope</span>
+    <span class="chip"><b>esc</b> back</span>
+  </div>
+</div>
+</body></html>

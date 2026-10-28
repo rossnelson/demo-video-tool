@@ -1,0 +1,16 @@
+[
+ ["00-intro", "The command palette puts the actions for the page you're on into one searchable list."],
+ ["01-open", "Press Command K on any page to open it, or choose Command palette from the user menu."],
+ ["02-search", "Type to filter the list. The arrow keys move the selection, and Enter runs it."],
+ ["03-page", "On a workflow page, that workflow's actions come first: copy its ID, its run ID, or the CLI command."],
+ ["04-paste", "Paste a workflow ID and press Enter to go straight to that workflow."],
+ ["05-actions", "Many rows have more than one action. Command K lists them all, and Command Enter runs the second."],
+ ["06-confirm", "Terminate asks you to press Enter a second time. When an action isn't available, the row says why."],
+ ["07-scopes", "To narrow the list, type a set's letter and a space, like G for Go to. Tab moves between scopes, and the chip opens a picker."],
+ ["08-views", "Some tools open their own list. Switch namespace shows every namespace you can reach, and Escape takes you back."],
+ ["09-recent", "Items you've used appear under Recent at the top, and the rest of the list keeps its order."],
+ ["10-prefs", "You can change the theme or the timezone, or search the docs, from the same place."],
+ ["11-dev", "Dev tools appear only on local and staging builds, with a DEV tag so no one mistakes them for user features."],
+ ["12-touch", "On a phone, every row and action has a tap target."],
+ ["13-outro", "That's the command palette. Press Command K to try it."]
+]

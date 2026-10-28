@@ -1,0 +1,16 @@
+.el-key
+.env
+.profile/
+.venv/
+__pycache__/
+video/audio/
+video/frames/
+video/frames.json
+video/durations.json
+video/beats.json
+video/plan.json
+video/record.log
+*.mp3
+*.mp4
+*.wav
+*.png

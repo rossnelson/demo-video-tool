@@ -11,3 +11,4 @@ projects/*/build/
 *.png
 .playwright-mcp/
 .impeccable/live/
+!docs/*.png

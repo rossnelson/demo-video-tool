@@ -1,13 +1,13 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><style>
 html,body{margin:0;width:{{width}}px;height:{{height}}px;overflow:hidden;background:{{colors.bg}};font-family:{{fonts.sans}};color:{{colors.text}};position:relative}
-.glow{position:absolute;left:50%;top:38%;width:2700px;height:1850px;transform:translate(-50%,-50%);background:radial-gradient(closest-side,{{colors.violet}}2e 0%,{{colors.uv}}26 25%,{{colors.uv}}14 45%,{{colors.uv}}06 62%,transparent 78%);opacity:.9}
-.stars i{position:absolute;width:3px;height:3px;border-radius:50%;background:{{colors.text}};opacity:.8}
+.glow{position:absolute;left:50%;top:38%;width:2700px;height:1850px;transform:translate(-50%,-50%);background:{{colors.glow}};opacity:.9}
+.stars i{position:absolute;width:3px;height:3px;border-radius:50%;background:{{colors.star}};opacity:.8}
 .content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:0 100px 40px;text-align:center}
 .row-keys{display:flex;gap:14px}
 .row-keys:empty,p:empty,.chips:empty{display:none}
-.key{display:flex;align-items:center;justify-content:center;min-width:76px;height:76px;padding:0 18px;border-radius:4px;background:linear-gradient(45deg,{{colors.violet}} 0%,{{colors.uv}} 100%);font-family:{{fonts.mono}};font-size:36px;font-weight:500;box-shadow:0 12px 40px {{colors.uv}}66}
-.key+.key{background:{{colors.bg}};border:1px solid {{colors.uv}};box-shadow:none}
+.key{display:flex;align-items:center;justify-content:center;min-width:76px;height:76px;padding:0 18px;border-radius:4px;background:linear-gradient(45deg,{{colors.violet}} 0%,{{colors.uv}} 100%);color:{{colors.onAccent}};font-family:{{fonts.mono}};font-size:36px;font-weight:500;box-shadow:0 12px 40px {{colors.uv}}66}
+.key+.key{background:{{colors.bg}};color:{{colors.text}};border:1px solid {{colors.uv}};box-shadow:none}
 h1{margin:0;font-size:96px;line-height:1.02;font-weight:300;letter-spacing:-.03em}
 .rule{width:140px;height:2px;background:linear-gradient(255deg,{{colors.mint}} 0%,{{colors.lime}} 100%)}
 p{margin:0;font-size:30px;font-weight:400;color:{{colors.muted}}}

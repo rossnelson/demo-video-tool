@@ -9,16 +9,16 @@
   .bar b{color:var(--text);font-weight:500}
   .bar .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);opacity:.9}
   .bar .right{margin-left:auto;letter-spacing:.06em}
-  #editor{overflow:hidden;position:relative;padding:10px 0}
+  #editor{overflow:hidden;position:relative;padding:14px 0}
   #code{margin:0;padding:0;list-style:none;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
   #code li{display:flex;min-height:1.55em;white-space:pre}
-  #code li .n{width:58px;flex:none;text-align:right;padding-right:18px;color:var(--gutter);user-select:none}
+  #code li .n{width:64px;flex:none;text-align:right;padding:0 20px 0 12px;box-sizing:border-box;color:var(--gutter);user-select:none}
   #code li.cur{background:var(--cur)}
   #code li.new .n{color:var(--accent)}
   .str{color:var(--str)}.key{color:var(--key)}.kw{color:var(--kw)}.num{color:var(--num)}.com{color:var(--com);font-style:italic}
   .caret{display:inline-block;width:8px;height:1.2em;vertical-align:-.25em;background:var(--text);animation:blink 1s steps(2) infinite}
   @keyframes blink{to{opacity:0}}
-  #term{background:#0a0c11;border-top:1px solid var(--line);padding:12px 18px;overflow:hidden;position:relative;font-size:14px;line-height:1.5}
+  #term{background:#0a0c11;border-top:1px solid var(--line);padding:14px 20px;overflow:hidden;position:relative;font-size:14px;line-height:1.5}
   #term .l{white-space:pre;color:var(--dim)}
   #term .l.cmd{color:var(--text)}
   #term .l.cmd::before{content:'$ ';color:var(--prompt)}

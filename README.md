@@ -2,7 +2,7 @@
 
 Makes a narrated product video from a browser: a screen recording with ElevenLabs narration, SVG transition cards and a music bed. The cuts fall on the music's downbeats. A video is a *project*: one directory with a `project.mjs` that holds the narration, the cards and the on-screen actions, plus whatever page or app it records.
 
-`projects/command-palette/` is the Temporal Cloud command palette intro. `projects/example/` records a small local page and is the template for new projects.
+`projects/command-palette/` is the Temporal Cloud command palette intro. `projects/example/` records a small local page and is the template for new projects. `projects/meta/` is the tool's own demo: a video about the tool, made with it, that shows its own project file and the build's logs between the cards, each scene's card in a different theme.
 
 ## What you need
 
@@ -30,7 +30,7 @@ bin/demo check    projects/my-video   # loudness of each narration window
 bin/demo splash   projects/my-video   # -> build/<name>-splash.png
 ```
 
-`bin/demo build <project>` runs plan, record, assemble and check. `bin/demo all <project>` runs everything. Everything lands in the project's `build/` directory, which git ignores.
+`bin/demo build <project>` runs plan, record, assemble and check. `bin/demo all <project>` runs everything. Everything lands in the project's `build/` directory, which git ignores, and each command also leaves its output in `build/<command>.log` (the previous one in `build/<command>.prev.log`).
 
 Useful while writing:
 
@@ -38,6 +38,7 @@ Useful while writing:
 - `bin/demo narrate <project> 03-page 04-paste` regenerates only those clips.
 - `bin/demo show <project>` prints the project with every default filled in.
 - `build/record.log` shows when each scene ended against the plan. `late: none` means every cut landed on its downbeat.
+- Any scene can take its own theme with `theme: 'paper'` or `theme: { name: 'temporal', options: { mode: 'light' } }`; the intro, outro, end card and splash follow the project's theme unless they name one too.
 
 ## Themes
 
@@ -97,7 +98,7 @@ export default {
 };
 ```
 
-Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card; `card: { … }` passes options to the theme for that card.
+Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card; `card: { … }` passes options to the theme for that card; `theme: 'paper'` (or a theme object like the project's) gives the scene its own theme.
 
 Hooks and actions get one `api` object:
 

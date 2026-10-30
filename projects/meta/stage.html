@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>project.mjs</title>
+<style>
+  :root{color-scheme:dark;--bg:#0f1218;--panel:#12161e;--line:#1c2230;--gutter:#4b5363;--text:#cfd3dc;--dim:#8a93a8;--cur:#1a2030;
+    --str:#9ccd79;--key:#7fc8f5;--kw:#c39df3;--num:#f0a35e;--com:#7580a0;--prompt:#58d68d;--accent:#5d8bf4}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 "JetBrains Mono","IBM Plex Mono","Noto Sans Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:grid;grid-template-rows:38px 1fr 38px minmax(0,34%)}
+  .bar{display:flex;align-items:center;gap:14px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--line);font-size:13px;color:var(--dim)}
+  .bar b{color:var(--text);font-weight:500}
+  .bar .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);opacity:.9}
+  .bar .right{margin-left:auto;letter-spacing:.06em}
+  #editor{overflow:hidden;position:relative;padding:10px 0}
+  #code{margin:0;padding:0;list-style:none;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+  #code li{display:flex;min-height:1.55em;white-space:pre}
+  #code li .n{width:58px;flex:none;text-align:right;padding-right:18px;color:var(--gutter);user-select:none}
+  #code li.cur{background:var(--cur)}
+  #code li.new .n{color:var(--accent)}
+  .str{color:var(--str)}.key{color:var(--key)}.kw{color:var(--kw)}.num{color:var(--num)}.com{color:var(--com);font-style:italic}
+  .caret{display:inline-block;width:8px;height:1.2em;vertical-align:-.25em;background:var(--text);animation:blink 1s steps(2) infinite}
+  @keyframes blink{to{opacity:0}}
+  #term{background:#0a0c11;border-top:1px solid var(--line);padding:12px 18px;overflow:hidden;position:relative;font-size:14px;line-height:1.5}
+  #term .l{white-space:pre;color:var(--dim)}
+  #term .l.cmd{color:var(--text)}
+  #term .l.cmd::before{content:'$ ';color:var(--prompt)}
+  #term .l.head{color:var(--text)}
+  #img{position:fixed;top:38px;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:#0a0c11}
+  #img img{max-width:84%;max-height:84%;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+</style></head>
+<body>
+<div class="bar"><span class="dot"></span><b id="file">projects/meta/project.mjs</b><span>this video's project</span><span class="right" id="lines"></span></div>
+<div id="editor"><ol id="code"></ol></div>
+<div class="bar"><b>bin/demo</b><span id="termlabel">the commands that built it</span></div>
+<div id="term"><div id="out"></div><div id="img"></div></div>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const KW = /^(export|default|async|await|const|let|return|import|from|new|null|true|false|function)$/;
+  // A small highlighter for one line of JavaScript.
+  function hl(line) {
+    let out = '';
+    const re = /(\/\/.*$)|('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(?=\s*:)|([A-Za-z_$][\w$]*)|(\s+|.)/g;
+    let m;
+    while ((m = re.exec(line))) {
+      if (m[1]) out += `<span class="com">${esc(m[1])}</span>`;
+      else if (m[2]) out += `<span class="str">${esc(m[2])}</span>`;
+      else if (m[3]) out += `<span class="num">${esc(m[3])}</span>`;
+      else if (m[4]) out += `<span class="key">${esc(m[4])}</span>`;
+      else if (m[5]) out += KW.test(m[5]) ? `<span class="kw">${esc(m[5])}</span>` : esc(m[5]);
+      else out += esc(m[6]);
+    }
+    return out;
+  }
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let lines = [], hidden = new Set();
+  const row = (i) => $('code').children[i - 1];
+  function draw(i) {
+    const li = row(i);
+    li.innerHTML = `<span class="n">${i}</span><span class="t">${hidden.has(i) ? '' : hl(lines[i - 1])}</span>`;
+  }
+  const lineH = () => row(1)?.getBoundingClientRect().height || 23;
+  const stage = {
+    // The file: its text, and the lines kept empty until typed.
+    load(text, hide = []) {
+      lines = text.replace(/\n$/, '').split('\n');
+      hidden = new Set(hide);
+      $('code').innerHTML = lines.map(() => '<li></li>').join('');
+      lines.forEach((_, i) => draw(i + 1));
+      $('lines').textContent = `${lines.length} lines`;
+      $('code').style.transform = 'translateY(0)';
+    },
+    // Scroll so line `i` sits a third of the way down the editor.
+    async reveal(i, ms = 600) {
+      const h = $('editor').clientHeight;
+      const y = Math.max(0, (i - 1) * lineH() - h / 3);
+      $('code').style.transform = `translateY(${-y}px)`;
+      for (const li of $('code').children) li.classList.remove('cur');
+      row(i)?.classList.add('cur');
+      await sleep(ms);
+    },
+    // Type a hidden line in, character by character.
+    async type(i, cps = 28) {
+      const text = lines[i - 1];
+      const li = row(i);
+      li.classList.add('cur', 'new');
+      hidden.delete(i);
+      const indent = text.match(/^\s*/)[0];
+      for (let k = indent.length; k <= text.length; k++) {
+        li.innerHTML = `<span class="n">${i}</span><span class="t">${hl(text.slice(0, k))}<span class="caret"></span></span>`;
+        await sleep(1000 / cps + (text[k - 1] === ' ' ? 40 : 0) + Math.random() * 30);
+      }
+      await sleep(350);
+      draw(i); li.classList.add('new');
+    },
+    // The terminal: a command typed at the prompt, then its output, line by line.
+    async cmd(text, cps = 30) {
+      const el = document.createElement('div'); el.className = 'l cmd'; $('out').append(el);
+      for (let k = 1; k <= text.length; k++) { el.innerHTML = `${esc(text.slice(0, k))}<span class="caret"></span>`; await sleep(1000 / cps + Math.random() * 25); }
+      await sleep(400);
+      el.textContent = text;
+      this.trim();
+    },
+    async out(text, lineMs = 70) {
+      for (const line of text.replace(/\n$/, '').split('\n')) {
+        const el = document.createElement('div'); el.className = `l${/^(==>|•)/.test(line) ? ' head' : ''}`; el.textContent = line; $('out').append(el);
+        this.trim();
+        await sleep(lineMs);
+      }
+    },
+    // Keep the terminal's last lines in view.
+    trim() {
+      const term = $('term'), out = $('out');
+      while (out.children.length > 1 && out.getBoundingClientRect().bottom > term.getBoundingClientRect().bottom - 8) out.firstChild.remove();
+    },
+    clear() { $('out').innerHTML = ''; },
+    label(text) { $('termlabel').textContent = text; },
+    // An image in the terminal's place (the splash, say); image(null) hides it.
+    image(src) { $('img').style.display = src ? 'flex' : 'none'; $('img').innerHTML = src ? `<img src="${esc(src)}" alt="the splash">` : ''; },
+  };
+  window.stage = stage;
+})();
+</script>
+</body></html>

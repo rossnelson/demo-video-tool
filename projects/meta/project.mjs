@@ -54,12 +54,12 @@ export default {
   scenes: [
     {
       name: '00-intro', kind: 'intro',
-      narration: 'This video was made by the tool it is about. Between the cards: its own project file, and the output of the commands that built it.',
+      narration: 'This video was made by the tool it\'s about. Which means that between the cards, what you\'re looking at is its own project file, and the real output of the commands that built it.',
     },
     {
       name: '01-project', step: '01', title: 'One file', subtitle: 'A project is a directory with a project.mjs',
       theme: 'slant',
-      narration: 'A video is one directory and one file: a title, a theme, the music, and the scenes. Each scene is a card, a narration, and what to do on screen. Any scene can name its own theme, and the next card shows it.',
+      narration: 'The whole video is one directory with a project file in it. Title, theme, where the music is, then the scenes. A scene is just a card, something to say, and what to do on screen while you say it. If a scene wants a different theme it says so, and the next card comes out that way.',
       async run(api) {
         await api.page.evaluate((n) => window.stage.reveal(n), lineOf(/^export default/));
         await api.wait(600);
@@ -71,7 +71,7 @@ export default {
     {
       name: '02-narrate', step: '02', title: 'Narrate', subtitle: 'ElevenLabs reads the script',
       theme: 'minimal',
-      narration: 'Narrate sends each scene\'s text to ElevenLabs. Dry makes silent clips of an estimated length, so you can plan before spending credits.',
+      narration: 'Narrate hands each scene\'s text to ElevenLabs and gets a voice back. There\'s a dry mode too. It makes silent clips about the right length, so you can lay the whole thing out before you spend a credit.',
       async run(api) {
         await command(api, 'bin/demo narrate projects/meta --dry', logOf('narrate'));
         await api.wait(1800);
@@ -81,7 +81,7 @@ export default {
     {
       name: '03-plan', step: '03', title: 'Beats and plan', subtitle: 'Every cut lands on a downbeat',
       theme: 'paper',
-      narration: 'Beats finds the downbeats of the music, and plan lays the scenes along them. Every cut lands on a downbeat.',
+      narration: 'Then the music. Beats listens to the track and finds the downbeats. Plan takes those and lays the scenes along them, so every cut in the video falls on one. You don\'t time anything by hand.',
       async run(api) {
         await command(api, 'bin/demo beats projects/meta', logOf('beats'));
         await api.wait(800);
@@ -93,7 +93,7 @@ export default {
     {
       name: '04-record', step: '04', title: 'Record', subtitle: 'Chromium, on the plan',
       theme: 'terminal',
-      narration: 'Record drives Chromium through the plan: each card, each scene\'s actions, and a log of whether every cut landed. This is the log of the previous take of this video.',
+      narration: 'Record opens Chromium and drives it through the plan. Every card, every scene\'s actions, and it keeps a log of whether each cut landed where it was meant to. What\'s on screen now is the log from the last take of this video.',
       async run(api) {
         await command(api, 'bin/demo record projects/meta', logOf('record', true));
         await api.wait(1500);
@@ -103,7 +103,7 @@ export default {
     {
       name: '05-assemble', step: '05', title: 'Assemble', subtitle: 'Voice, music, frames',
       theme: 'poster',
-      narration: 'Assemble mixes the voice over the music, ducks the music under the voice, and encodes the frames on the plan\'s timing.',
+      narration: 'Assemble puts it together. The voice goes over the music, the music dips whenever the voice comes in, and the frames get encoded on the plan\'s timing.',
       async run(api) {
         await command(api, 'bin/demo assemble projects/meta', logOf('assemble'));
         await api.wait(1500);
@@ -113,7 +113,7 @@ export default {
     {
       name: '06-themes', step: '06', title: 'Six themes', subtitle: 'Or a directory of your own',
       theme: 'temporal',
-      narration: 'Six themes ship. A theme owns the cards, the end card, the key hint and the splash; the engine owns the timing. Theme renders any of them in seconds, without a recording.',
+      narration: 'There are six themes in the box. A theme decides what the cards look like, the end card, the little key hint, the splash image. It doesn\'t touch timing. That stays with the engine. And you can preview a theme in a few seconds without recording anything.',
       async run(api) {
         await command(api, 'bin/demo theme temporal projects/meta', themeLog);
         await api.wait(1500);
@@ -123,7 +123,7 @@ export default {
     {
       name: '07-fail', step: '07', title: 'Options', subtitle: 'A theme can offer them',
       theme: { name: 'temporal', options: { wipe: 'fail' } },
-      narration: 'A theme can offer options. Temporal has three wipes; this one stops on a failed activity and runs the retry until the row completes.',
+      narration: 'Themes can have options. Temporal, for instance, has three different wipes. This is the one where an activity fails, and you watch the retry run until the row completes.',
       async run(api) {
         await api.wait(1500);
         await typeLine(api, /card: \{ wipe: 'signal' \}/);
@@ -132,7 +132,7 @@ export default {
     {
       name: '08-signal', step: '08', title: 'Per scene', subtitle: 'card: { … } passes options to one card',
       card: { wipe: 'signal' },
-      narration: 'A scene can pass options to its own card. This one asked for the signal: it lands where the title will sit, and the title grows out of the spot.',
+      narration: 'And a single scene can hand options to its own card. This one asked for the signal. It lands right where the title is about to sit, and the title grows out of that spot.',
       async run(api) {
         await api.wait(1500);
         await typeLine(api, /mode: 'light'/);
@@ -141,7 +141,7 @@ export default {
     {
       name: '09-light', step: '09', title: 'Modes', subtitle: 'The same theme, a light table',
       theme: { name: 'temporal', options: { mode: 'light' } },
-      narration: 'A theme can have modes. Temporal\'s light one is the same timeline on Off White.',
+      narration: 'Modes, too. This is Temporal again. Same timeline, light version, on Off White.',
       async run(api) {
         await api.wait(1500);
         await typeLine(api, /rest: 'stars'/);
@@ -150,7 +150,7 @@ export default {
     {
       name: '10-stars', step: '10', title: 'Rest states', subtitle: 'What sits behind the title',
       card: { rest: 'stars' },
-      narration: 'Behind the title, a theme can offer rest states: the UI\'s time axis, or this field of slow stars.',
+      narration: 'What sits behind the title is up to the theme as well. Temporal gives you the time axis from the UI, or, if you\'d rather, this. A slow field of stars.',
       async run(api) {
         await api.wait(1500);
         await api.page.evaluate((n) => window.stage.reveal(n), lineOf(/^export default/));
@@ -158,7 +158,7 @@ export default {
     },
     {
       name: '11-splash', step: '11', title: 'Splash', subtitle: 'A title image from the same theme',
-      narration: 'Splash renders a title image from the same theme, for the thumbnail. And build runs plan, record, assemble and a loudness check in a row.',
+      narration: 'Splash makes a title image in the same theme, which is what you\'d use for the thumbnail. And if you don\'t want to run the steps one at a time, build does plan, record, assemble and a loudness check, back to back.',
       async run(api) {
         await command(api, 'bin/demo splash projects/meta', logOf('splash'));
         const splash = join(here, 'build', 'meta-splash.png');
@@ -168,7 +168,7 @@ export default {
     },
     {
       name: '12-outro', kind: 'outro', subtitle: 'bin/demo new, then bin/demo all',
-      narration: 'Copy the example project, write the scenes, point it at your page, and run it. The cards, the cuts and the mix come with it.',
+      narration: 'So. Copy the example project, write your scenes, point it at your page, run it. The cards and the cuts and the mix, you get for free.',
     },
     {
       name: '13-end', kind: 'end',

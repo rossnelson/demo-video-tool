@@ -55,7 +55,7 @@ music_gain = MIX['musicLufs'] - loudness(MUSIC['path'])
 fade_len = plan['bar'] * MUSIC['fadeBars']
 filters.append(f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0:duration=longest,apad=whole_dur={total:.3f},atrim=end={total:.3f},asplit=3[voice][key][voicestem]")
 filters.append(f"[{m}:a]aformat=channel_layouts=stereo,atrim=start={plan['musicOffset']:.3f},asetpts=PTS-STARTPTS,atrim=end={total:.3f},volume={music_gain:.2f}dB,afade=t=out:st={total - fade_len:.3f}:d={fade_len:.3f}[bed]")
-filters.append("[bed][key]sidechaincompress=threshold=0.02:ratio=4:attack=30:release=500:makeup=1,asplit=2[ducked][bedstem]")
+filters.append("[bed][key]sidechaincompress=threshold=0.02:ratio=3:attack=250:release=1200:makeup=1,asplit=2[ducked][bedstem]")
 filters.append(f"[voice][ducked]amix=inputs=2:normalize=0:duration=longest,alimiter=limit=0.89:level=false,atrim=end={total:.3f},afade=t=out:st={total - 1.0:.3f}:d=1.0[mix]")
 
 def run(cmd):

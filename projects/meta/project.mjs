@@ -39,7 +39,7 @@ export default {
   keys: ['↵'],
   theme: 'temporal',
   timing: { cardBeats: 12, holdBeats: 8 },
-  music: { path: null },
+  music: { path: 'music/butter-extended.wav', leadIn: 1.0, downbeat: 22.668 },   // Butter by Lukrembo (freetouse.com), extended by music/extend.py
   browser: { profile: null, headless: true },
   splash: { chips: [{ key: '↵', label: 'bin/demo all' }] },
 

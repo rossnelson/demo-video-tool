@@ -68,7 +68,7 @@ export default {
   keys: ['⌘', 'K'],                   // key caps on the cards and the splash; [] for none
   theme: 'slant',                     // or { name, colors, fonts, pad } or './my-theme'
   voice: { id, model, format, settings },                           // ElevenLabs
-  music: { path, leadIn, firstDownbeatAt, fadeBars },
+  music: { path, leadIn, firstDownbeatAt, fadeBars, downbeat },             // downbeat: a known downbeat's time, if the detector picks the wrong beat
   mix: { voiceLufs: -16, musicLufs: -27 },
   timing: { cardBeats: 8, holdBeats: 4, gap: 0.6, introGap: 0.4, outroBars: 3, endBars: 4 },
   video: { width: 1920, height: 1080, fps: 30, background, quality },   // background defaults to the theme's pad

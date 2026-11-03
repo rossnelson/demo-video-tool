@@ -63,6 +63,6 @@ check_var() {  # name, purpose
 }
 check_var ELEVENLABS_API_KEY "demo narrate needs it, or write the key to .el-key; --dry works without"
 check_var MUSIC              "overrides music.path in a project's project.mjs"
-# A project may read more (projects/command-palette uses BASE_URL and NAMESPACE).
+# A project may read more of its own, such as the URL of the app it records.
 
 say "Ready: bin/demo <command> <project-dir>. Try: bin/demo all projects/example --dry"

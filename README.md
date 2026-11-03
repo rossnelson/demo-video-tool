@@ -2,7 +2,7 @@
 
 Makes a narrated product video from a browser: a screen recording with ElevenLabs narration, SVG transition cards and a music bed. The cuts fall on the music's downbeats. A video is a *project*: one directory with a `project.mjs` that holds the narration, the cards and the on-screen actions, plus whatever page or app it records.
 
-`projects/command-palette/` is the Temporal Cloud command palette intro. `projects/example/` records a small local page and is the template for new projects. `projects/meta/` is the tool's own demo: a video about the tool, made with it, that shows its own project file and the build's logs between the cards, each scene's card in a different theme.
+`projects/example/` records a small local page and is the template for new projects. `projects/meta/` is the tool's own demo: a video about the tool, made with it, that shows its own project file and the build's logs between the cards, each scene's card in a different theme.
 
 ## What you need
 
@@ -120,11 +120,7 @@ Browser profile: `browser.profile` (default `.profile/` in the project, or `PROF
 
 Splash: the theme's `splash.html` is the page. It takes `{{title}}`, `{{subtitle}}`, `{{url}}`, `{{keys}}`, `{{chips}}`, `{{width}}`, `{{height}}`, and the theme's tokens as `{{colors.bg}}` or `{{fonts.sans}}`. A project can point `splash.file` at its own page.
 
-## The command palette project
-
-Records Cloud UI. Set `BASE_URL` (default `http://localhost:3000`) and `NAMESPACE`, and sign in to the window on the first run. The recorder starts a demo workflow for the workflow scenes; if a run stops early, `node projects/command-palette/terminate.mjs <workflow url>` terminates it. Music: `~/Downloads/above-the-next-wave.mp3`, or `MUSIC`.
-
-## Settings carried over
+## Defaults
 
 - Voice: ElevenLabs `cBTYF7NiJbR8Bvmdeuse`, model `eleven_multilingual_v2`, stability 0.45, similarity 0.8, style 0.35, speaker boost on. `VOICE_ID` overrides the voice.
 - Mix: each narration clip at -16 LUFS, the music at -27 LUFS. The music ducks under the voice and fades over the last two bars.

@@ -35,7 +35,7 @@ export default {
   name: 'meta',
   title: 'Demo video tool',
   subtitle: 'Narrated product videos from a browser',
-  url: 'github.com/rossnelson/command-palette-video',
+  url: 'github.com/rossnelson/demo-video-tool',
   keys: ['↵'],
   theme: 'temporal',
   timing: { cardBeats: 12, holdBeats: 8 },

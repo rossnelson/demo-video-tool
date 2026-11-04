@@ -5,9 +5,9 @@ max_score: 24
 na_heuristics: 3,5,9,10
 p0_count: 0
 p1_count: 2
-target_identity: "file:/home/user/command-palette-video/lib/themes/temporal/card.js"
+target_identity: "file:/home/user/demo-video-tool/lib/themes/temporal/card.js"
 target_fingerprint: "sha256:e705afce9d65d3dc313ddf72a61f5d7a3e6ded5c9318ef142f72d38a8341dcea"
-target_path: /home/user/command-palette-video/lib/themes/temporal/card.js
+target_path: /home/user/demo-video-tool/lib/themes/temporal/card.js
 timestamp: 2026-10-29T04-00-28Z
 slug: lib-themes-temporal-card-js
 ---

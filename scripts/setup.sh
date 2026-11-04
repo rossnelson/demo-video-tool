@@ -6,12 +6,12 @@
 # environment's secrets (those arrive as variables inside the session).
 # Paste this file's contents into the environment's "Setup script" field,
 # or, once it is on main, use the one-liner:
-#   cd command-palette-video && bash scripts/setup.sh
+#   cd demo-video-tool && bash scripts/setup.sh
 #
 # Idempotent: safe to re-run inside a session.
 set -euo pipefail
 
-REPO_DIR="${REPO_DIR:-command-palette-video}"
+REPO_DIR="${REPO_DIR:-demo-video-tool}"
 [ "$(basename "$PWD")" = "$REPO_DIR" ] || cd "$REPO_DIR"
 
 say()  { printf '\n==> %s\n' "$*"; }

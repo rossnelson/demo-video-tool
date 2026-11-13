@@ -48,8 +48,13 @@ for i, scene in enumerate(scenes):
         end = next_downbeat(max(narration + dur + T['gap'], start + T['endBars'] * BAR))
         hold = (end - start) + 4 * BAR
     else:
-        narration = start + CARD
-        end = next_downbeat(narration + dur + T['gap'])
+        # card: false has no card to wait for, so the voice starts with the scene.
+        narration = start if scene.get('card') is False else start + CARD
+        # minSeconds keeps a scene up at least that long (from its start), for
+        # what the narration cannot time: a live answer streaming in, a page
+        # that loads slowly, a silent beat to read the screen.
+        least = start + scene.get('minSeconds', 0)
+        end = next_downbeat(max(narration + dur + T['gap'], least))
         hold = T['holdBeats'] * BEAT
     plan[name] = {'start': round(start, 3), 'narration': round(narration, 3), 'end': round(end, 3), 'holdMs': round(hold * 1000)}
     order.append(name)

@@ -34,6 +34,8 @@ bin/demo splash   projects/my-video   # -> build/<name>-splash.png
 
 Useful while writing:
 
+- A project that records its own stage page (like `projects/meta/`): what the page shows under a card is on screen as the card leaves (a theme may fade its card out over the page), so set each scene's start state there and animate everything else in `run`. Anything drawn under the card and drawn again in `run` shows twice.
+
 - `bin/demo narrate <project> --dry` makes silent clips of an estimated length, so you can plan and record without spending ElevenLabs credits.
 - `bin/demo narrate <project> 03-page 04-paste` regenerates only those clips.
 - `bin/demo show <project>` prints the project with every default filled in.
@@ -98,7 +100,7 @@ export default {
 };
 ```
 
-Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card; `card: { … }` passes options to the theme for that card; `theme: 'paper'` (or a theme object like the project's) gives the scene its own theme.
+Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card, and its narration then starts with the scene instead of after a card's length; `minSeconds: 12` keeps a scene up at least that long from its start (still ending on a downbeat), for what narration cannot time, such as a live answer streaming in or a page that loads slowly, and lets a scene other than the end card be silent; `card: { … }` passes options to the theme for that card; `theme: 'paper'` (or a theme object like the project's) gives the scene its own theme.
 
 Hooks and actions get one `api` object:
 

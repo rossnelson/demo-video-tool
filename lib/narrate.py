@@ -6,6 +6,7 @@ build/durations.json.
 """
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -32,8 +33,16 @@ def api_key():
     return key
 
 
+def spoken(text):
+    # voice.pronounce maps a written word to how the voice should say it,
+    # e.g. {'VendGogh': 'Vendgo'}. Only the text sent to the voice changes.
+    for word, say in (voice.get('pronounce') or {}).items():
+        text = re.sub(re.escape(word), say, text, flags=re.IGNORECASE)
+    return text
+
+
 def speak(text, out):
-    body = json.dumps({'text': text, 'model_id': voice['model'], 'voice_settings': voice['settings']}).encode()
+    body = json.dumps({'text': spoken(text), 'model_id': voice['model'], 'voice_settings': voice['settings']}).encode()
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?output_format={voice['format']}",
         data=body, method='POST',

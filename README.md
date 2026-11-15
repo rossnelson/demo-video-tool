@@ -74,7 +74,7 @@ export default {
   mix: { voiceLufs: -16, musicLufs: -27 },
   timing: { cardBeats: 8, holdBeats: 4, gap: 0.6, introGap: 0.4, outroBars: 3, endBars: 4 },
   video: { width: 1920, height: 1080, fps: 30, background, quality },   // background defaults to the theme's pad
-  browser: { viewport, deviceScaleFactor, colorScheme, permissions, profile, headless },
+  browser: { viewport, deviceScaleFactor, colorScheme, permissions, profile, headless, channel, args, ignoreDefaultArgs },   // channel: 'chrome' for a real Chrome
   splash: { width, height, scale, chips: [{ key: '↵', label: 'run' }], file },
 
   async setup(api) {},                // before recording: sign in, seed data, open the first page

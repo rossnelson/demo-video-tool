@@ -67,6 +67,10 @@ the top of `theme.mjs`. `bin/demo theme <name>` previews with
 - **All motion is CSS animation** keyed to `beat`. No JavaScript timers for
   motion. The preview scrubs CSS animations to fixed moments; JS motion is
   invisible to it and drifts against the music.
+  The recorder opens a video on the first card already at rest by moving
+  the card's CSS animations to the end of its entry, so a card whose entry
+  is not CSS opens half drawn. Anything that starts at or after the out
+  time (`2 * beat + holdMs`) counts as the exit and is left alone.
 - Escape every string you put into HTML. Titles come from project files
   and contain quotes and ampersands.
 - Size type with `min(px, vw)` so the same card fits a 1440-wide desktop

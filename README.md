@@ -68,6 +68,7 @@ export default {
   subtitle: 'A tiny to-do list',
   url: 'notes.example.com',           // on the end card
   keys: ['⌘', 'K'],                   // key caps on the cards and the splash; [] for none
+  open: 'card',                       // the first frame: 'card' (default) or 'page'
   theme: 'slant',                     // or { name, colors, fonts, pad } or './my-theme'
   voice: { id, model, format, settings },                           // ElevenLabs
   music: { path, leadIn, firstDownbeatAt, fadeBars },
@@ -101,6 +102,8 @@ export default {
 ```
 
 Scenes play in order. A `scene` gets a card that plays for `cardBeats`, then its narration, and ends on the first downbeat after the narration plus `gap`. An `intro` or `outro` card holds through its narration and takes the project's title and subtitle unless the scene gives its own. An `end` card comes last, shows the title, the `url` and any `lines`, holds for at least `endBars`, and stays while the music fades; it may have narration or none. `card: false` skips a scene's card, and its narration then starts with the scene instead of after a card's length; `minSeconds: 12` keeps a scene up at least that long from its start (still ending on a downbeat), for what narration cannot time, such as a live answer streaming in or a page that loads slowly, and lets a scene other than the end card be silent; `card: { … }` passes options to the theme for that card; `theme: 'paper'` (or a theme object like the project's) gives the scene its own theme.
+
+How a video opens: with `open: 'card'` (the default) the first frame is the first scene's card, already drawn. Before filming starts, the recorder runs the first scene's `before()`, puts its card on screen, and moves the card's entry animations to their end. Filming starts after that paint is done, and the card leaves on the planned beat. Without it, the video opens on whatever page `setup` left open, and the first wipe stalls and then jumps, because the first card a page draws is slow to paint. `open: 'page'` opens on the page and wipes the first card in, for a video that should start on the product; the recorder still draws that card once off camera so its wipe runs smoothly. A first scene with `card: false` always opens on the page. `record.log` says which: `opens on: the 00-intro card, at rest`. To open on a title, start with an `intro` scene. Leave `setup` on a page you are happy to show only when you use `open: 'page'`.
 
 Hooks and actions get one `api` object:
 

@@ -97,6 +97,14 @@ if out=$(release 0.4.0); then fail "a failed tag stops the release" "$out"; else
 fi
 (cd "$tmp/repo" && git config --unset tag.gpgSign && git config --unset gpg.program)
 
+echo "a failed git add"
+touch "$tmp/repo/.git/index.lock"
+if release 0.4.0 >/dev/null 2>&1; then fail "a failed git add stops the release"; else
+  rm -f "$tmp/repo/.git/index.lock"
+  (cd "$tmp/repo" && [ -z "$(git status --porcelain)" ]) && pass "a failed git add leaves a clean tree" || fail "a failed git add left VERSION changed" "$(cd "$tmp/repo" && git status --porcelain)"
+fi
+rm -f "$tmp/repo/.git/index.lock"
+
 echo "a failed release commit"
 printf '#!/bin/sh\nexit 1\n' > "$tmp/repo/.git/hooks/pre-commit"; chmod +x "$tmp/repo/.git/hooks/pre-commit"
 head_before=$(cd "$tmp/repo" && git rev-parse HEAD)

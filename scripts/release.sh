@@ -49,9 +49,13 @@ else
   start=$(git rev-parse HEAD)
   # Until the push succeeds, any failure (a hook, signing, a rejected push)
   # undoes the local commit and tag, so the release can run again.
-  undo() { git tag -d "$tag" >/dev/null 2>&1 || true; git reset -q --hard "$start"; die "$1; nothing was published"; }
-  echo "$version" > VERSION
-  git add VERSION
+  undo() {
+    git tag -d "$tag" >/dev/null 2>&1 || true
+    # git may be locked (another git process): then put VERSION back by hand.
+    git reset -q --hard "$start" 2>/dev/null || echo "$current" > VERSION
+    die "$1; nothing was published"
+  }
+  { echo "$version" > VERSION && git add VERSION; } || undo "VERSION could not be written or staged"
   if ! git diff --cached --quiet; then   # no commit when VERSION already says $version
     git commit -qm "Release $tag" || undo "the release commit failed"
   fi

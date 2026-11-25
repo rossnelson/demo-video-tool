@@ -41,22 +41,23 @@ if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; the
   echo "The tag $tag is published; writing the formula only."
 else
   ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "the tag $tag exists here but not on origin: remove it (git tag -d $tag)"
+  # Never back: the version is the one on main (its first release) or newer.
+  current=$(cat VERSION)
+  num() { local IFS=.; set -- $1; printf '%05d%05d%05d' "$1" "$2" "$3"; }
+  [[ $current =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "VERSION on main is not X.Y.Z: $current"
+  [ "$(num "$version")" \> "$(num "$current")" ] || [ "$version" = "$current" ] || die "main is at $current: $version is older"
   start=$(git rev-parse HEAD)
+  # Until the push succeeds, any failure (a hook, signing, a rejected push)
+  # undoes the local commit and tag, so the release can run again.
+  undo() { git tag -d "$tag" >/dev/null 2>&1 || true; git reset -q --hard "$start"; die "$1; nothing was published"; }
   echo "$version" > VERSION
   git add VERSION
-  # No commit when VERSION already says $version; any other failure of the
-  # commit (a hook, signing) stops the release before the tag.
-  if ! git diff --cached --quiet; then
-    git commit -qm "Release $tag" || { git reset -q --hard "$start"; die "the release commit failed; nothing was tagged"; }
+  if ! git diff --cached --quiet; then   # no commit when VERSION already says $version
+    git commit -qm "Release $tag" || undo "the release commit failed"
   fi
-  git tag -a "$tag" -m "demo-video $version"
-  # --atomic: the tag is not published when the push of main fails. Then undo
-  # the local commit and tag, so the release can run again.
-  if ! git push -q --atomic origin main "$tag"; then
-    git tag -d "$tag" >/dev/null
-    git reset -q --hard "$start"
-    die "the push was rejected; nothing was published"
-  fi
+  git tag -a "$tag" -m "demo-video $version" || undo "the tag failed"
+  # --atomic: the tag is not published when the push of main fails.
+  git push -q --atomic origin main "$tag" || undo "the push was rejected"
 fi
 
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT

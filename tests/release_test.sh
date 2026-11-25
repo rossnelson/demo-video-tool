@@ -82,6 +82,21 @@ out=$(release 0.3.0) && pass "release 0.3.0" || fail "release 0.3.0" "$out"
 cp "$tmp/tap/Formula/demo-video.rb" "$tmp/formula.before"
 release 0.2.0 >/dev/null 2>&1 && fail "an older published version fails" || { cmp -s "$tmp/formula.before" "$tmp/tap/Formula/demo-video.rb" && pass "an older published version fails and keeps the formula" || fail "an older version changed the formula"; }
 
+echo "an older version with no tag"
+cp "$tmp/tap/Formula/demo-video.rb" "$tmp/formula.before"; head_before=$(cd "$tmp/repo" && git rev-parse HEAD)
+if release 0.2.5 >/dev/null 2>&1; then fail "an older new version fails"; else
+  cmp -s "$tmp/formula.before" "$tmp/tap/Formula/demo-video.rb" && [ "$(cd "$tmp/repo" && git rev-parse HEAD)" = "$head_before" ] \
+    && ! git --git-dir="$tmp/remote.git" rev-parse -q --verify refs/tags/v0.2.5 >/dev/null \
+    && pass "an older new version fails and changes nothing" || fail "an older new version changed something"
+fi
+
+echo "a failed tag"
+(cd "$tmp/repo" && git config tag.gpgSign true && git config gpg.program false)
+if out=$(release 0.4.0); then fail "a failed tag stops the release" "$out"; else
+  (cd "$tmp/repo" && [ "$(git rev-parse HEAD)" = "$head_before" ] && [ -z "$(git status --porcelain)" ]) && pass "a failed tag undoes the release commit" || fail "a failed tag left the release commit" "$(cd "$tmp/repo" && git log --oneline -2 && git status --porcelain && echo want $head_before)"
+fi
+(cd "$tmp/repo" && git config --unset tag.gpgSign && git config --unset gpg.program)
+
 echo "a failed release commit"
 printf '#!/bin/sh\nexit 1\n' > "$tmp/repo/.git/hooks/pre-commit"; chmod +x "$tmp/repo/.git/hooks/pre-commit"
 head_before=$(cd "$tmp/repo" && git rev-parse HEAD)

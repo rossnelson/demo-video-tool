@@ -50,8 +50,8 @@ esac
 # The same places as narrate, in its order.
 if [ -n "${ELEVENLABS_API_KEY:-}" ]; then found "ElevenLabs key" "\$ELEVENLABS_API_KEY"
 elif [ -n "$project" ] && [ -s "$project/.el-key" ]; then found "ElevenLabs key" "$project/.el-key"
-elif [ -s "$config/el-key" ]; then found "ElevenLabs key" "$config/el-key"
 elif [ -s "$root/.el-key" ]; then found "ElevenLabs key" "$root/.el-key"
+elif [ -s "$config/el-key" ]; then found "ElevenLabs key" "$config/el-key"
 elif [ -z "$project" ]; then lacking "ElevenLabs key" "set ELEVENLABS_API_KEY, or write it to $config/el-key; for a key in a project's .el-key, run doctor <project> (narrate --dry needs none)"
 else lacking "ElevenLabs key" "set ELEVENLABS_API_KEY, or write it to $project/.el-key or $config/el-key (narrate --dry needs none)"
 fi

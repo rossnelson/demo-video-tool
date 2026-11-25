@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # demo-video doctor: reports each dependency as found or missing, and what
 # fixes a missing one. Exits 1 when anything is missing.
-#   doctor.sh <tool root>
+#   doctor.sh <tool root> [project dir]
 set -uo pipefail
 root=${1:?doctor.sh <tool root>}
+project=${2:-}
 home=${DEMO_VIDEO_HOME:?DEMO_VIDEO_HOME is not set}
 config=${XDG_CONFIG_HOME:-$HOME/.config}/demo-video
 missing=0
@@ -46,10 +47,13 @@ case $pw in
   *)         lacking "playwright" "run demo-video setup" ;;
 esac
 
+# The same places as narrate, in its order.
 if [ -n "${ELEVENLABS_API_KEY:-}" ]; then found "ElevenLabs key" "\$ELEVENLABS_API_KEY"
+elif [ -n "$project" ] && [ -s "$project/.el-key" ]; then found "ElevenLabs key" "$project/.el-key"
 elif [ -s "$config/el-key" ]; then found "ElevenLabs key" "$config/el-key"
 elif [ -s "$root/.el-key" ]; then found "ElevenLabs key" "$root/.el-key"
-else lacking "ElevenLabs key" "set ELEVENLABS_API_KEY, or write it to $config/el-key or a project's .el-key (narrate --dry needs none)"
+elif [ -z "$project" ]; then lacking "ElevenLabs key" "set ELEVENLABS_API_KEY, or write it to $config/el-key; for a key in a project's .el-key, run doctor <project> (narrate --dry needs none)"
+else lacking "ElevenLabs key" "set ELEVENLABS_API_KEY, or write it to $project/.el-key or $config/el-key (narrate --dry needs none)"
 fi
 
 if [ "$missing" -ne 0 ]; then echo; echo "Something is missing: see the lines above."; exit 1; fi

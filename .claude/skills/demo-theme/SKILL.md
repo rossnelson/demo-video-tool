@@ -97,8 +97,10 @@ the top of `theme.mjs`. `bin/demo theme <name>` previews with
    place, then adjust timings. Keep the 2-beat in and out.
 4. **Look after every pass.** `bin/demo theme <name>` (or
    `bin/demo theme ./path/to/theme`, or `bin/demo theme <name> <project-dir>`
-   to use a project's words, keys and overrides) renders 13 shots and a
-   contact sheet in `build/themes/<name>/` in a few seconds. Read
+   to use a project's words and keys, and its theme overrides when `<name>` is
+   the project's own theme) renders 13 shots and a contact sheet in a few
+   seconds, in `build/themes/<name>/` of the current folder, or in
+   `<project-dir>/build/themes/<name>-<project name>/` with a project. Read
    `sheet.png` first; open single shots to check detail. The shots are:
    five moments through the scene card, a long title with no keys, three
    keys with no step or subtitle, the intro card, the phone frame, the end

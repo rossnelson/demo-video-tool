@@ -18,11 +18,15 @@
 #   assemble             mix and encode -> build/<name>.mp4
 #   check                loudness of each narration window in the mix
 #   splash               render the splash image -> build/<name>-splash.png
+#   review               after a build: a strip of frames for each card entry,
+#                        exit and handover, late scenes and short pages
+#                        -> build/review/, build/review/report.md
 #   build                plan, record, assemble, check
 #   all                  narrate, beats, build, splash
 #   themes               list the themes in lib/themes
 #   theme <name> [project]  preview a theme's cards and splash -> ./build/themes/<name>/,
-#                        or <project>/build/themes/<name>-<project name>/
+#                        or <project>/build/themes/<name>-<project name>/, and
+#                        check its transitions (transitions.md there)
 set -euo pipefail
 
 # The real path of this script, through any symlinks (Homebrew links it into
@@ -100,6 +104,7 @@ case $cmd in
   assemble) logged assemble "$python" "$lib/assemble.py" "$project" "$@" ;;
   check)    logged check "$python" "$lib/check_audio.py" "$project" "$@" ;;
   splash)   logged splash node "$lib/splash.mjs" "$project" "$@" ;;
+  review)   logged review node "$lib/review.mjs" "$project" ;;
   build)
     run "plan"     "$self" plan "$project"
     run "record"   "$self" record "$project"

@@ -91,5 +91,49 @@ else
   echo "  skip  no critter theme at $critter"
 fi
 
+echo "a review of a built video (R5.S1, R5.S2)"
+proj="$tmp/rv"
+mkdir -p "$proj/build"
+cat >"$proj/project.mjs" <<'PROJECT'
+export default {
+  name: 'rv', title: 'Review test', theme: 'minimal',
+  scenes: [
+    { name: '00-intro', kind: 'intro', narration: 'Hello.' },
+    { name: '01-add', step: '01', title: 'Add', narration: 'Add one.', async run() {} },
+    { name: '02-short', step: '02', title: 'Short', narration: 'Quick.', async run() {} },
+    { name: '03-end', kind: 'end' },
+  ],
+};
+PROJECT
+cat >"$proj/build/plan.json" <<'PLAN'
+{ "beat": 0.5, "bar": 2, "musicOffset": 0, "total": 14, "musicFade": 12,
+  "order": ["00-intro", "01-add", "02-short", "03-end"],
+  "segments": {
+    "00-intro": { "start": 0, "narration": 1, "end": 4, "holdMs": 2000 },
+    "01-add":   { "start": 4, "narration": 6, "end": 9, "holdMs": 1000 },
+    "02-short": { "start": 9, "narration": 11, "end": 11.2, "holdMs": 1000 },
+    "03-end":   { "start": 11.2, "narration": 12.2, "end": 14, "holdMs": 2000 } } }
+PLAN
+printf '%s\n' '01-add ends at 9.00 planned 9.00' "late: [ '02-short started 0.42s late' ]" >"$proj/build/record.log"
+ffmpeg -v error -f lavfi -i "color=c=0x303040:s=640x360:r=30:d=14" -pix_fmt yuv420p -y "$proj/build/rv.mp4"
+out=$(demo review rv 2>&1)
+report=$(cat "$proj/build/review/report.md" 2>/dev/null)
+missing=
+for f in 00-intro-handover 01-add-exit 02-short-entry 02-short-exit 03-end-entry; do
+  [ -f "$proj/build/review/$f.png" ] || missing="$missing $f.png"
+done
+[ ! -f "$proj/build/review/01-add-entry.png" ] || missing="$missing (01-add-entry.png: the handover has it)"
+if [ -z "$missing" ]; then pass "a strip for each entry, exit and handover"; else fail "missing:$missing" "$out"; fi
+expect "the report names each strip with its time" "$report" "02-short-entry.png: 02-short card entry, from 9.00 s" "01-add-exit.png: 01-add card exit, from 6.00 s" "00-intro-handover.png: handover from 00-intro to 01-add, from 3.00 s"
+expect "the late scene" "$report" "- 02-short started 0.42 s late"
+expect "the short page" "$report" "02-short shows its page for 1.2 s before the 03-end card"
+expect "the report is printed" "$out" "# Review: rv" "strips and the report in"
+
+echo "a review with nothing built (R5.S3)"
+mkdir -p "$tmp/empty" && cp "$proj/project.mjs" "$tmp/empty/"
+out=$(demo review empty 2>&1); status=$?
+expect "says to build first" "$out" "run bin/demo build empty first"
+if [ "$status" -ne 0 ]; then pass "exits with an error"; else fail "exits with an error" "$out"; fi
+
 printf '\n%d passed, %d failed\n' "$passes" "$fails"
 [ "$fails" -eq 0 ]

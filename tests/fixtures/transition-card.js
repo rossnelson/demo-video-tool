@@ -4,6 +4,8 @@
 //   small  the title moves up 30 px as the card fades (exit too small)
 //   wipe   a clip-path wipe of the card, no move
 //   slide  the card slides in from below and off the top, no opacity
+//   bob    the whole card fades out while its title bobs 12 px all along (no exit)
+//   quick  the title, then the subtitle, jump up 100 px in 0.15 s each (exit too small)
 // With opts.keep, the slide card's words leave and the paper stays; with
 // opts.afterCard, the paper is already up and the words slide in.
 (() => {
@@ -26,6 +28,8 @@
 h1{margin:0;font-size:96px}p{margin:0;font-size:36px;font-weight:400;color:#4d4a45}
 @keyframes fadeIn{from{opacity:0}}@keyframes fadeOut{to{opacity:0}}
 @keyframes lift{to{transform:translateY(-30px)}}
+@keyframes bob{from{transform:translateY(-12px)}to{transform:translateY(12px)}}
+@keyframes jump{to{transform:translateY(-100px)}}
 @keyframes wipeIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes wipeOut{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(0 0 0 100%)}}
 @keyframes slideIn{from{transform:translateY(100%)}to{transform:none}}
@@ -34,6 +38,11 @@ h1{margin:0;font-size:96px}p{margin:0;font-size:36px;font-weight:400;color:#4d4a
       fade: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}`,
       small: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}
 h1{${leave ? `animation:lift ${1.5 * B}ms ease-in ${out}ms forwards` : ''}}`,
+      bob: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}
+h1{animation:bob ${1.3 * B}ms ease-in-out infinite alternate}`,
+      quick: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${0.2 * B}ms ease ${out + 1.7 * B}ms forwards` : ''}}
+h1{${leave ? `animation:jump ${0.3 * B}ms linear ${out}ms forwards` : ''}}
+p{${leave ? `animation:jump ${0.3 * B}ms linear ${out + 0.8 * B}ms forwards` : ''}}`,
       wipe: `.demo{clip-path:inset(0 100% 0 0);animation:wipeIn ${B}ms ease forwards${leave ? `, wipeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}`,
       slide: o.keep || o.afterCard
         ? `.card{${o.afterCard ? 'transform:translateY(100%);' : ''}animation:${[o.afterCard ? `slideIn ${B}ms ease-out forwards` : '', o.keep && leave ? `slideOut ${1.5 * B}ms ease-in ${out}ms forwards` : ''].filter(Boolean).join(', ') || 'none'}}`

@@ -48,6 +48,8 @@ theme fade fade
 theme small small
 theme wipe wipe
 theme slide slide true
+theme bob bob
+theme quick quick
 
 echo "a theme with only a whole-card fade (R1.S1, R2.S1, R4.S1)"
 out=$(demo theme ./themes/fade 2>&1)
@@ -68,6 +70,14 @@ expect "the last line gives the count and the report" "$(tail -1 <<<"$out")" "tr
 
 echo "an exit that moves the title 30 px (R1.S2)"
 expect "exit too small with the distance" "$(demo theme ./themes/small 2>&1)" "exit too small: the largest movement is 30 px (h1), under 60 px"
+
+echo "a whole-card fade with a bobbing title (R1.S1)"
+out=$(demo theme ./themes/bob 2>&1)
+expect "a bob is not an exit" "$out" "no exit: nothing on the card moves"
+refuse "and not too small" "$out" "exit too small"
+
+echo "two quick moves one after the other (R1)"
+expect "each part is too short" "$(demo theme ./themes/quick 2>&1)" "exit too small: the longest part of the exit lasts"
 
 echo "a wipe (R1.S4)"
 refuse "a wipe is an exit" "$(demo theme ./themes/wipe 2>&1)" "no exit" "exit too small"
@@ -124,10 +134,22 @@ for f in 00-intro-handover 01-add-exit 02-short-entry 02-short-exit 03-end-entry
 done
 [ ! -f "$proj/build/review/01-add-entry.png" ] || missing="$missing (01-add-entry.png: the handover has it)"
 if [ -z "$missing" ]; then pass "a strip for each entry, exit and handover"; else fail "missing:$missing" "$out"; fi
-expect "the report names each strip with its time" "$report" "02-short-entry.png: 02-short card entry, from 9.00 s" "01-add-exit.png: 01-add card exit, from 6.00 s" "00-intro-handover.png: handover from 00-intro to 01-add, from 3.00 s"
+expect "the report names each strip with its time" "$report" "01-add-exit.png: 01-add card exit, from 6.00 s" "00-intro-handover.png: handover from 00-intro to 01-add, from 3.00 s"
 expect "the late scene" "$report" "- 02-short started 0.42 s late"
+expect "a late scene's strips move with it" "$report" "02-short-entry.png: 02-short card entry, from 9.42 s"
 expect "the short page" "$report" "02-short shows its page for 1.2 s before the 03-end card"
 expect "the report is printed" "$out" "# Review: rv" "strips and the report in"
+
+echo "a review of a video that ends on an outro"
+proj2="$tmp/rv2"
+mkdir -p "$proj2/build"
+sed -e "s/name: 'rv'/name: 'rv2'/" -e "s/{ name: '03-end', kind: 'end' },/{ name: '03-outro', kind: 'outro', narration: 'Bye.' },/" "$proj/project.mjs" >"$proj2/project.mjs"
+sed 's/03-end/03-outro/g' "$proj/build/plan.json" | sed 's/"holdMs": 2000 } } }/"holdMs": 10800 } } }/' >"$proj2/build/plan.json"
+cp "$proj/build/record.log" "$proj2/build/"
+cp "$proj/build/rv.mp4" "$proj2/build/rv2.mp4"
+out=$(demo review rv2 2>&1)
+refuse "an outro never leaves" "$out" "03-outro-exit" "Not read"
+expect "the outro's entry" "$out" "03-outro-entry.png"
 
 echo "a review with nothing built (R5.S3)"
 mkdir -p "$tmp/empty" && cp "$proj/project.mjs" "$tmp/empty/"

@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # Makes a narrated, music-timed screen recording from a project directory.
 #
-#   bin/demo <command> <project-dir> [args]
+#   demo-video <command> <project-dir> [args]     (bin/demo in a checkout)
 #
+#   setup                install the beat tracker and Playwright with Chromium
+#                        into the data folder ($DEMO_VIDEO_HOME)
+#   doctor [project]     report each dependency as found or missing (and the
+#                        project's .el-key, when a project is given)
+#   --version            print the version
 #   new <dir>            start a project from projects/example
 #   show                 print the project with its defaults filled in
 #   narrate [scene ...]  ElevenLabs narration -> build/audio, build/durations.json
@@ -16,25 +21,52 @@
 #   build                plan, record, assemble, check
 #   all                  narrate, beats, build, splash
 #   themes               list the themes in lib/themes
-#   theme <name> [project]  preview a theme's cards and splash -> build/themes/<name>/
+#   theme <name> [project]  preview a theme's cards and splash -> ./build/themes/<name>/,
+#                        or <project>/build/themes/<name>-<project name>/
 set -euo pipefail
-root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-lib="$root/lib"
 
-usage() { sed -n '2,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit "${1:-2}"; }
+# The real path of this script, through any symlinks (Homebrew links it into
+# its bin). macOS readlink has no -f on every version, so follow each link.
+self=${BASH_SOURCE[0]}
+while [ -L "$self" ]; do
+  link=$(readlink "$self")
+  case $link in /*) self=$link ;; *) self=$(dirname "$self")/$link ;; esac
+done
+# pwd -P: the real path, as node sees its own files (a symlinked folder such
+# as /tmp on macOS would otherwise break lib/project.mjs's main check).
+root=$(cd "$(dirname "$self")/.." && pwd -P)
+lib="$root/lib"
+# The name to show: the formula's wrapper sets DEMO_VIDEO_NAME, because it runs
+# this file as libexec/bin/demo; a symlink or a checkout gives it in $0.
+me=${DEMO_VIDEO_NAME:-$(basename "$0")}
+
+# Per-user data: the beat tracker's venv and Playwright with Chromium.
+export DEMO_VIDEO_HOME="${DEMO_VIDEO_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/demo-video}"
+# Absolute: node's createRequire and doctor (which changes folder) need it.
+case $DEMO_VIDEO_HOME in /*) ;; *) DEMO_VIDEO_HOME="$PWD/$DEMO_VIDEO_HOME" ;; esac
+
+# The usage is the comment block at the top: every line from 2 to the first
+# line that is not a comment.
+usage() { sed -n '2,/^[^#]/p' "$self" | sed '$d' | sed 's/^# \{0,1\}//' | sed "s|demo-video <command>|$me <command>|"; exit "${1:-2}"; }
 cmd=${1:-}; [ -n "$cmd" ] || usage
 shift
 case $cmd in
   -h|--help|help) usage 0 ;;
+  -v|--version|version) echo "demo-video $(cat "$root/VERSION")"; exit 0 ;;
+  setup)  exec bash "$lib/setup.sh" "$root" ;;
+  doctor) exec bash "$lib/doctor.sh" "$root" "${1:-}" ;;
   themes) exec node "$lib/theme-preview.mjs" --list ;;
-  theme)  [ -n "${1:-}" ] || { echo "demo theme: which theme?" >&2; usage; }; exec node "$lib/theme-preview.mjs" "$@" ;;
+  theme)  [ -n "${1:-}" ] || { echo "$me theme: which theme?" >&2; usage; }; exec node "$lib/theme-preview.mjs" "$@" ;;
 esac
-project=${1:-}; [ -n "$project" ] || { echo "demo $cmd: which project directory?" >&2; usage; }
+project=${1:-}; [ -n "$project" ] || { echo "$me $cmd: which project directory?" >&2; usage; }
 shift
 
 python=python3
+# The beat tracker: the checkout's .venv, else the one demo-video setup made.
 beats_python=python3
-[ -x "$root/.venv/bin/python" ] && beats_python="$root/.venv/bin/python"
+if [ -x "$root/.venv/bin/python" ]; then beats_python="$root/.venv/bin/python"
+elif [ -x "$DEMO_VIDEO_HOME/venv/bin/python" ]; then beats_python="$DEMO_VIDEO_HOME/venv/bin/python"
+fi
 
 run() { printf '\n==> %s\n' "$1"; shift; "$@"; }
 # Runs a command with its output also in build/<name>.log; the previous log
@@ -52,7 +84,7 @@ case $cmd in
     [ ! -e "$project" ] || { echo "$project already exists" >&2; exit 1; }
     cp -R "$root/projects/example" "$project"
     rm -rf "$project/build" "$project/.profile"
-    echo "Made $project from projects/example. Edit $project/project.mjs."
+    echo "Made $project from the example project. Edit $project/project.mjs."
     ;;
   show)     node "$lib/project.mjs" "$project" ;;
   narrate)  logged narrate "$python" "$lib/narrate.py" "$project" "$@" ;;
@@ -69,16 +101,16 @@ case $cmd in
   check)    logged check "$python" "$lib/check_audio.py" "$project" "$@" ;;
   splash)   logged splash node "$lib/splash.mjs" "$project" "$@" ;;
   build)
-    run "plan"     "$0" plan "$project"
-    run "record"   "$0" record "$project"
-    run "assemble" "$0" assemble "$project"
-    run "check"    "$0" check "$project"
+    run "plan"     "$self" plan "$project"
+    run "record"   "$self" record "$project"
+    run "assemble" "$self" assemble "$project"
+    run "check"    "$self" check "$project"
     ;;
   all)
-    run "narrate"  "$0" narrate "$project" "$@"
-    run "beats"    "$0" beats "$project"
-    "$0" build "$project"
-    run "splash"   "$0" splash "$project"
+    run "narrate"  "$self" narrate "$project" "$@"
+    run "beats"    "$self" beats "$project"
+    "$self" build "$project"
+    run "splash"   "$self" splash "$project"
     ;;
-  *) echo "demo: unknown command $cmd" >&2; usage ;;
+  *) echo "$me: unknown command $cmd" >&2; usage ;;
 esac

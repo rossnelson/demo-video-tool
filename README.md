@@ -4,7 +4,21 @@ Makes a narrated product video from a browser: a screen recording with ElevenLab
 
 `projects/command-palette/` is the Temporal Cloud command palette intro. `projects/example/` records a small local page and is the template for new projects. `projects/meta/` is the tool's own demo: a video about the tool, made with it, that shows its own project file and the build's logs between the cards, each scene's card in a different theme.
 
+The site, with a guide and a reference: https://rossnelson.github.io/demo-video-tool/
+
 ## What you need
+
+Install the `demo-video` command with Homebrew, then let it install the rest:
+
+```
+brew install rossnelson/tools/demo-video   # ffmpeg, node and python come with it
+demo-video setup                              # the beat tracker and Playwright with Chromium
+demo-video doctor                             # what is found, what is missing
+```
+
+`setup` puts the beat tracker's Python environment and Playwright in `~/.local/share/demo-video` (or `$DEMO_VIDEO_HOME`). Put the ElevenLabs key in `ELEVENLABS_API_KEY`, a project's `.el-key`, or `~/.config/demo-video/el-key`. The installed command takes the same commands as `bin/demo` below: `demo-video all my-video` is `bin/demo all my-video`.
+
+To work on the tool itself, from a checkout:
 
 - `ffmpeg`, `ffprobe`, Node 20+ and Python 3.
 - Playwright with Chromium. The cloud image has it; elsewhere `npm install -g playwright && npx playwright install chromium`, or set `PLAYWRIGHT_DIR` to a checkout that has it.
@@ -55,7 +69,7 @@ A theme owns the look: the scene cards, the end card, the key hint and the splas
 
 Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`. A theme may offer options: the temporal theme has three wipes, chosen with `theme: { name: 'temporal', options: { wipe: 'fail' } }` (`rail` sweeps the timeline across; `fail` stops it on a failed activity, shakes, and runs the retry on to the rail until the row completes with the UI's failed-to-completed gradient; `signal` lands a signal on the title and the title grows out of the spot; or `cycle` to rotate), and any scene can pick its own with `card: { wipe: 'rail' }`. The `fail` wipe takes four beats and `signal` five, and either falls back to `rail` when the card's hold is shorter than the wipe minus one beat, so give such a project a longer card with `timing: { cardBeats: 12, holdBeats: 8 }`. The end card uses `rail` unless its scene names a wipe. The theme also has a light mode, `theme: { name: 'temporal', options: { mode: 'light' } }`, and two rest states behind the title, `rest: 'axis'` (the UI's time-axis ticks, the default) or `rest: 'stars'`; a scene can pick its own with `card: { rest: 'stars' }`. The splash always draws the axis. The fail wipe captions its retry `Attempt 2`, the UI's wording; change it with `options: { retryLabel: 'second try' }` or per scene with `card: { retryLabel: 'second try' }`, or drop it with `retryLabel: null`. On the end card the key caps are outlined and the axis ticks drift slowly.
 
-`bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
+`bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` in the current folder, with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys, into `<project>/build/themes/<name>-<project name>/`. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
 
 ## A project
 
@@ -136,3 +150,7 @@ Records Cloud UI. Set `BASE_URL` (default `http://localhost:3000`) and `NAMESPAC
 - Voice: ElevenLabs `cBTYF7NiJbR8Bvmdeuse`, model `eleven_multilingual_v2`, stability 0.45, similarity 0.8, style 0.35, speaker boost on. `VOICE_ID` overrides the voice.
 - Mix: each narration clip at -16 LUFS, the music at -27 LUFS. The music ducks under the voice and fades over the last two bars.
 - `el.sh <endpoint>` calls the ElevenLabs API with your key, for looking up voices or usage.
+
+## Releases
+
+`scripts/release.sh 0.2.0` writes `VERSION`, tags `v0.2.0`, pushes the tag, and writes the tag archive's `url` and `sha256` into `Formula/demo-video.rb` of the tap checkout (`TAP_DIR`, default `../homebrew-tools`). Commit and push the tap after it. `tests/cli_test.sh` and `tests/release_test.sh` test the command and the release script.

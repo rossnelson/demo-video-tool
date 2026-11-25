@@ -1,0 +1,170 @@
+@import '@fontsource-variable/schibsted-grotesk/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
+/*
+ * Warm paper and ink, with one colour: the red of a cut. The red marks only
+ * what the tool puts on the beat (cuts, the playhead) and the links.
+ */
+:root {
+	color-scheme: light;
+
+	--bg: #f5f2ec;
+	--raised: #ebe6dc;
+	--code: #efeae1;
+	--ink: #1c1a17;
+	--ink-2: #57514a;
+	--ink-3: #7a7369;
+	--rule: #d8d0c2;
+	--rule-strong: #b9b0a1;
+	--cut: #b83b1a;
+	--cut-soft: rgb(184 59 26 / 0.12);
+	--select: rgb(184 59 26 / 0.2);
+
+	--sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+	--mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+	--gutter: clamp(16px, 4vw, 40px);
+	--page: 70rem;
+	--measure: 68ch;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		color-scheme: dark;
+
+		--bg: #141312;
+		--raised: #1e1c1a;
+		--code: #1a1917;
+		--ink: #ece6dc;
+		--ink-2: #b0a89c;
+		--ink-3: #8a8278;
+		--rule: #2f2c28;
+		--rule-strong: #47433d;
+		--cut: #f07a55;
+		--cut-soft: rgb(240 122 85 / 0.14);
+		--select: rgb(240 122 85 / 0.28);
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	background: var(--bg);
+	color: var(--ink);
+	-webkit-text-size-adjust: 100%;
+	scrollbar-color: var(--rule-strong) transparent;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	font-family: var(--sans);
+	font-size: 1.0625rem;
+	line-height: 1.6;
+	font-optical-sizing: auto;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+::selection {
+	background: var(--select);
+	color: var(--ink);
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.12;
+	letter-spacing: -0.02em;
+	text-wrap: balance;
+	font-weight: 640;
+	margin: 0;
+}
+
+h1 {
+	font-size: clamp(2.1rem, 5.2vw, 3.6rem);
+	letter-spacing: -0.035em;
+	font-weight: 680;
+}
+
+h2 {
+	font-size: clamp(1.45rem, 2.6vw, 1.9rem);
+	margin-top: 3.5rem;
+	margin-bottom: 0.9rem;
+}
+
+h3 {
+	font-size: 1.15rem;
+	margin-top: 2.2rem;
+	margin-bottom: 0.5rem;
+	letter-spacing: -0.01em;
+}
+
+p {
+	margin: 0 0 1rem;
+	text-wrap: pretty;
+}
+
+a {
+	color: var(--cut);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+	text-decoration-color: color-mix(in srgb, var(--cut) 45%, transparent);
+	transition: text-decoration-color 160ms ease-out;
+}
+
+a:hover {
+	text-decoration-color: currentColor;
+}
+
+:focus-visible {
+	outline: 2px solid var(--cut);
+	outline-offset: 3px;
+	border-radius: 3px;
+}
+
+code,
+pre,
+kbd {
+	font-family: var(--mono);
+	font-size: 0.88em;
+	font-variant-ligatures: none;
+}
+
+:not(pre) > code {
+	background: var(--raised);
+	padding: 0.1em 0.35em;
+	border-radius: 4px;
+	overflow-wrap: anywhere;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	font-variant-numeric: tabular-nums;
+}
+
+/* The width of one reading column, inside the page. */
+.prose {
+	max-width: var(--measure);
+}
+
+.lead {
+	font-size: clamp(1.1rem, 1.8vw, 1.28rem);
+	line-height: 1.5;
+	color: var(--ink-2);
+	max-width: 40ch;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

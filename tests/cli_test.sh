@@ -30,7 +30,8 @@ version=$(cat "$root/VERSION")
 echo "version and help (R1.S1)"
 expect "--version" "$(dv --version)" "demo-video $version"
 help=$(dv --help)
-expect "--help lists every command" "$help" "demo-video <command>" setup doctor --version new show narrate beats plan record assemble check splash build all themes theme
+expect "--help lists every command" "$help" "demo-video <command>" setup doctor --version new show narrate beats plan record assemble check splash build all themes "theme <name> [project]"
+expect "the formula's wrapper name" "$(DEMO_VIDEO_NAME=demo-video "$root/bin/demo" --help; DEMO_VIDEO_NAME=demo-video "$root/bin/demo" nope 2>&1)" "demo-video <command>" "demo-video nope: which project directory?"
 
 echo "a new project outside the checkout (R1.S2)"
 out=$(dv new "my video" 2>&1)
@@ -78,6 +79,13 @@ out=$(DEMO_VIDEO_HOME="$tmp/empty" dv doctor 2>&1); status=$?
 expect "doctor lists the tools" "$out" "node" "python3"
 expect "doctor lists what is missing" "$out" "missing  playwright" "missing  ElevenLabs key" "demo-video setup" "el-key"
 [ -x "$root/.venv/bin/python" ] || expect "doctor lists the beat tracker" "$out" "missing  beat tracker"
+
+mkdir -p "$tmp/keyed"; echo "k" > "$tmp/keyed/.el-key"
+expect "doctor finds a project's .el-key" "$(DEMO_VIDEO_HOME="$tmp/empty" dv doctor "$tmp/keyed" 2>&1)" "found    ElevenLabs key $tmp/keyed/.el-key"
+
+echo "a tool folder with a space in its path"
+cp -R "$root/bin" "$root/lib" "$root/VERSION" "$tmp/with space/" 2>/dev/null || { mkdir -p "$tmp/with space" && cp -R "$root/bin" "$root/lib" "$root/VERSION" "$tmp/with space/"; }
+expect "themes from a folder with a space" "$(cd "$tmp/work" && "$tmp/with space/bin/demo" themes 2>&1)" slant paper
 
 echo "a per-user ElevenLabs key (R3.S1)"
 # A project with one line, and a urlopen stub that prints the key it was sent.

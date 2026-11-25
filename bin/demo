@@ -5,7 +5,8 @@
 #
 #   setup                install the beat tracker and Playwright with Chromium
 #                        into the data folder ($DEMO_VIDEO_HOME)
-#   doctor               report each dependency as found or missing
+#   doctor [project]     report each dependency as found or missing (and the
+#                        project's .el-key, when a project is given)
 #   --version            print the version
 #   new <dir>            start a project from projects/example
 #   show                 print the project with its defaults filled in
@@ -20,7 +21,8 @@
 #   build                plan, record, assemble, check
 #   all                  narrate, beats, build, splash
 #   themes               list the themes in lib/themes
-#   theme <name> [project]  preview a theme's cards and splash -> build/themes/<name>/
+#   theme <name> [project]  preview a theme's cards and splash -> ./build/themes/<name>/,
+#                        or <project>/build/themes/<name>-<project name>/
 set -euo pipefail
 
 # The real path of this script, through any symlinks (Homebrew links it into
@@ -32,19 +34,23 @@ while [ -L "$self" ]; do
 done
 root=$(cd "$(dirname "$self")/.." && pwd)
 lib="$root/lib"
-me=$(basename "$0")
+# The name to show: the formula's wrapper sets DEMO_VIDEO_NAME, because it runs
+# this file as libexec/bin/demo; a symlink or a checkout gives it in $0.
+me=${DEMO_VIDEO_NAME:-$(basename "$0")}
 
 # Per-user data: the beat tracker's venv and Playwright with Chromium.
 export DEMO_VIDEO_HOME="${DEMO_VIDEO_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/demo-video}"
 
-usage() { sed -n '2,22p' "$self" | sed 's/^# \{0,1\}//' | sed "s|demo-video <command>|$me <command>|"; exit "${1:-2}"; }
+# The usage is the comment block at the top: every line from 2 to the first
+# line that is not a comment.
+usage() { sed -n '2,/^[^#]/p' "$self" | sed '$d' | sed 's/^# \{0,1\}//' | sed "s|demo-video <command>|$me <command>|"; exit "${1:-2}"; }
 cmd=${1:-}; [ -n "$cmd" ] || usage
 shift
 case $cmd in
   -h|--help|help) usage 0 ;;
   -v|--version|version) echo "demo-video $(cat "$root/VERSION")"; exit 0 ;;
   setup)  exec bash "$lib/setup.sh" "$root" ;;
-  doctor) exec bash "$lib/doctor.sh" "$root" ;;
+  doctor) exec bash "$lib/doctor.sh" "$root" "${1:-}" ;;
   themes) exec node "$lib/theme-preview.mjs" --list ;;
   theme)  [ -n "${1:-}" ] || { echo "$me theme: which theme?" >&2; usage; }; exec node "$lib/theme-preview.mjs" "$@" ;;
 esac

@@ -50,6 +50,7 @@ theme wipe wipe
 theme slide slide true
 theme bob bob
 theme quick quick
+theme bobmove bobmove
 
 echo "a theme with only a whole-card fade (R1.S1, R2.S1, R4.S1)"
 out=$(demo theme ./themes/fade 2>&1)
@@ -75,6 +76,9 @@ echo "a whole-card fade with a bobbing title (R1.S1)"
 out=$(demo theme ./themes/bob 2>&1)
 expect "a bob is not an exit" "$out" "no exit: nothing on the card moves"
 refuse "and not too small" "$out" "exit too small"
+
+echo "a bobbing title that then rises 100 px (R1)"
+refuse "the rise is a good exit" "$(demo theme ./themes/bobmove 2>&1)" "no exit" "exit too small"
 
 echo "two quick moves one after the other (R1)"
 expect "each part is too short" "$(demo theme ./themes/quick 2>&1)" "exit too small: the longest part of the exit lasts"
@@ -124,7 +128,7 @@ cat >"$proj/build/plan.json" <<'PLAN'
     "02-short": { "start": 9, "narration": 11, "end": 11.2, "holdMs": 1000 },
     "03-end":   { "start": 11.2, "narration": 12.2, "end": 14, "holdMs": 2000 } } }
 PLAN
-printf '%s\n' '01-add ends at 9.00 planned 9.00' "late: [ '02-short started 0.42s late' ]" >"$proj/build/record.log"
+printf '%s\n' '01-add ends at 9.00 planned 9.00' "late: [ '01-add started 0.5s late', '02-short started 0.42s late' ]" >"$proj/build/record.log"
 ffmpeg -v error -f lavfi -i "color=c=0x303040:s=640x360:r=30:d=14" -pix_fmt yuv420p -y "$proj/build/rv.mp4"
 out=$(demo review rv 2>&1)
 report=$(cat "$proj/build/review/report.md" 2>/dev/null)
@@ -134,7 +138,7 @@ for f in 00-intro-handover 01-add-exit 02-short-entry 02-short-exit 03-end-entry
 done
 [ ! -f "$proj/build/review/01-add-entry.png" ] || missing="$missing (01-add-entry.png: the handover has it)"
 if [ -z "$missing" ]; then pass "a strip for each entry, exit and handover"; else fail "missing:$missing" "$out"; fi
-expect "the report names each strip with its time" "$report" "01-add-exit.png: 01-add card exit, from 6.00 s" "00-intro-handover.png: handover from 00-intro to 01-add, from 3.00 s"
+expect "the report names each strip with its time" "$report" "01-add-exit.png: 01-add card exit, from 6.50 s" "00-intro-handover.png: handover from 00-intro to 01-add, from 3.00 s to 5.50 s"
 expect "the late scene" "$report" "- 02-short started 0.42 s late"
 expect "a late scene's strips move with it" "$report" "02-short-entry.png: 02-short card entry, from 9.42 s"
 expect "the short page" "$report" "02-short shows its page for 1.2 s before the 03-end card"

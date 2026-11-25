@@ -23,13 +23,20 @@ voice = project['voice']
 voice_id = os.environ.get('VOICE_ID', voice['id'])
 
 
+def config_key_file():
+    config = os.environ.get('XDG_CONFIG_HOME') or os.path.join(os.path.expanduser('~'), '.config')
+    return os.path.join(config, 'demo-video', 'el-key')
+
+
 def api_key():
+    # The environment, the project's .el-key, a checkout's .el-key, then the
+    # per-user config file (for an installed demo-video).
     key = os.environ.get('ELEVENLABS_API_KEY')
-    for path in [os.path.join(project['dir'], '.el-key'), os.path.join(os.path.dirname(__file__), '..', '.el-key')]:
+    for path in [os.path.join(project['dir'], '.el-key'), os.path.join(os.path.dirname(__file__), '..', '.el-key'), config_key_file()]:
         if not key and os.path.exists(path):
             key = open(path).read().strip()
     if not key:
-        sys.exit('Set ELEVENLABS_API_KEY or write the key to .el-key (or run with --dry)')
+        sys.exit(f"No ElevenLabs key: set ELEVENLABS_API_KEY, or write the key to the project's .el-key or to {config_key_file()} (or run with --dry)")
     return key
 
 

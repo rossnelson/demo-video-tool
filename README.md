@@ -125,7 +125,7 @@ Hooks and actions get one `api` object:
 
 Browser profile: `browser.profile` (default `.profile/` in the project, or `PROFILE_DIR`) is a persistent Chrome profile, so sign-ins survive between runs. Set it to `null` for a fresh context each run.
 
-Splash: the theme's `splash.html` is the page. It takes `{{title}}`, `{{subtitle}}`, `{{url}}`, `{{keys}}`, `{{chips}}`, `{{width}}`, `{{height}}`, and the theme's tokens as `{{colors.bg}}` or `{{fonts.sans}}`. A project can point `splash.file` at its own page.
+Splash: the theme's `splash.html` is the page. It takes `{{title}}`, `{{subtitle}}`, `{{url}}`, `{{keys}}`, `{{chips}}`, `{{width}}`, `{{height}}`, the theme's tokens as `{{colors.bg}}` or `{{fonts.sans}}`, and `{{dir}}`, the theme's folder as a file URL, for its own images. A project can point `splash.file` at its own page.
 
 ## The command palette project
 

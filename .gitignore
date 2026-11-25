@@ -13,3 +13,4 @@ projects/*/build/
 .impeccable/live/
 !docs/*.png
 .pw/
+!site/static/share.png

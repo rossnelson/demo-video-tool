@@ -17,6 +17,10 @@ if not frames:
     sys.exit('frames.json has no frames')
 pauses = [p for p in data.get('pauses', []) if 'end' in p]
 t0 = data.get('recStart') or frames[0]['t']
+# The screencast can still send frames while the recording is paused (off camera).
+# vt() maps such a frame past the pause, which stretches the frame before it and
+# moves every later frame behind the voice: drop them.
+frames = [f for f in frames if not any(p['start'] <= f['t'] < p['end'] for p in pauses)]
 V, MIX, MUSIC = project['video'], project['mix'], project['music']
 if not MUSIC['path']:
     sys.exit('No music track: set music.path in project.mjs or $MUSIC')

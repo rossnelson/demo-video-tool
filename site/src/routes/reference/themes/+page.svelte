@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Meta from '#lib/Meta.svelte';
 	import CodeBlock from '#lib/CodeBlock.svelte';
 	import RefHead from '#lib/reference/RefHead.svelte';
 	import type { PageProps } from './$types';
@@ -11,10 +12,11 @@ theme: { name: 'temporal', options: { mode: 'light' } }, // with an option
 theme: './my-theme',                                     // a theme folder of your own`;
 </script>
 
-<svelte:head>
-	<title>Themes · demo-video</title>
-	<meta name="description" content="The built-in demo-video themes, with their colours." />
-</svelte:head>
+<Meta
+	title="Themes · demo-video"
+	description="The built-in demo-video themes, with their colours."
+	route="/reference/themes"
+/>
 
 <RefHead title="Themes">
 	A theme owns the look: the scene cards, the end card, the key hint and the splash. The engine owns the timing. Pick

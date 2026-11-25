@@ -1,14 +1,16 @@
 <script lang="ts">
+	import Meta from '#lib/Meta.svelte';
 	import RefHead from '#lib/reference/RefHead.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head>
-	<title>Commands · demo-video</title>
-	<meta name="description" content="Every demo-video command and what it does." />
-</svelte:head>
+<Meta
+	title="Commands · demo-video"
+	description="Every demo-video command and what it does."
+	route="/reference/commands"
+/>
 
 <RefHead title="Commands">
 	Every command takes a project folder, relative to where you are, except <code>setup</code>, <code>doctor</code>,

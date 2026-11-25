@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Meta from '#lib/Meta.svelte';
 	import CodeBlock from '#lib/CodeBlock.svelte';
 	import { install } from '#lib/install.ts';
 	import { link } from '#lib/links.ts';
@@ -27,10 +28,11 @@ echo 'sk_…' > ~/.config/demo-video/el-key       # every project`;
 	];
 </script>
 
-<svelte:head>
-	<title>Your first video · demo-video</title>
-	<meta name="description" content="Install demo-video, make a project, do a silent dry run, then make the narrated video." />
-</svelte:head>
+<Meta
+	title="Your first video · demo-video"
+	description="Install demo-video, make a project, do a silent dry run, then make the narrated video."
+	route="/guide"
+/>
 
 <article class="guide">
 	<header class="head">

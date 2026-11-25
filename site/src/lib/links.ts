@@ -14,3 +14,19 @@ export const nav: { route: Route; label: string }[] = [
 	{ route: '/reference/project', label: 'Project file' },
 	{ route: '/reference/themes', label: 'Themes' }
 ];
+
+/** Where GitHub Pages serves the site. Link previews need full URLs. */
+export const site = 'https://rossnelson.github.io/demo-video-tool';
+
+/** The full URL of a page of the site, with the trailing slash the pages use. */
+export function absolute(route: Route): string {
+	return route === '/' ? `${site}/` : `${site}${route}/`;
+}
+
+/** The image a link preview shows, for every page (site/static/share.png). */
+export const share = {
+	url: `${site}/share.png`,
+	width: 1200,
+	height: 630,
+	alt: 'demo-video: product videos that cut on the beat. A beat ruler with a red cut on a downbeat, and the install command.'
+};

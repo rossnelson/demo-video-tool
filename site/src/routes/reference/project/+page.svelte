@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Meta from '#lib/Meta.svelte';
 	import CodeBlock from '#lib/CodeBlock.svelte';
 	import RefHead from '#lib/reference/RefHead.svelte';
 	import { api, hooks, sceneFields, sceneKinds } from '#lib/reference/project.ts';
@@ -20,10 +21,11 @@
 };`;
 </script>
 
-<svelte:head>
-	<title>Project file · demo-video</title>
-	<meta name="description" content="Every field of a demo-video project.mjs, with its default, plus scenes, hooks and the api." />
-</svelte:head>
+<Meta
+	title="Project file · demo-video"
+	description="Every field of a demo-video project.mjs, with its default, plus scenes, hooks and the api."
+	route="/reference/project"
+/>
 
 <RefHead title="Project file">
 	A project is a folder with a <code>project.mjs</code> that exports one object. Everything but <code>scenes</code> is

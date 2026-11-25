@@ -35,9 +35,9 @@ jobs:
     # demo-video setup for real: the beat tracker's venv and Playwright with
     # Chromium in a fresh data folder, twice, then doctor.
     runs-on: macos-latest
-    env:
-      DEMO_VIDEO_HOME: ${{ runner.temp }}/demo-video
     steps:
+      - name: a fresh data folder
+        run: echo "DEMO_VIDEO_HOME=$RUNNER_TEMP/demo-video" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:

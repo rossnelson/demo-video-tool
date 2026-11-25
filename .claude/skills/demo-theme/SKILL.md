@@ -86,6 +86,35 @@ the top of `theme.mjs`. `bin/demo theme <name>` previews with
   stage; move large elements with `transform` and `opacity`, which the
   compositor handles. A static blurred glow is fine: it paints once.
 
+## Transitions
+
+Every card leaves as clearly as it came in. Four rules, and
+`bin/demo theme` checks each one:
+
+- **Every card needs an exit that mirrors its entry.** What slid, wiped or
+  popped in leaves the same way, reversed. A plain fade of the whole card
+  is no exit: nothing on the card moves. The check reports **no exit**
+  when only the whole card's opacity changes, and **exit too small** when
+  the largest move is under 60 px or the exit lasts under 0.3 s (a 36 px
+  move with a slow ease-in, under a fade, does not read). Parts that fade
+  out one after another, or a clip-path wipe, count as an exit.
+- **Never fade a light layer over a dark page with opacity.** The middle
+  frames are an average of the two, and a cream card over a dark app goes
+  a muddy grey. Slide it off or wipe it (a `clip-path` or a `transform`),
+  in and out. The check plays the entry and the exit over a light page and
+  a dark one and reports **grey wash** when a middle frame is such a fade
+  with much less contrast than the two ends.
+- **Declare `handover: true` in `theme.mjs`.** Then title to title is
+  animated (`opts.keep`, `opts.afterCard`, see the README) instead of a
+  hard cut. Without it the check reports **cut between two cards**.
+- **Check with `bin/demo theme` before a build.** After the shots it plays
+  the scene card's entry, exit and handover at 12 fps, writes a strip of
+  frames for each to `transitions/` and the findings to `transitions.md`,
+  and ends with the count. Read the findings and the strips, fix, and run
+  it again. After a build, `bin/demo review <project>` puts the same strips
+  of the real video in `build/review/`, with the grey wash check, the late
+  scenes and the short pages in `report.md`.
+
 ## Workflow
 
 1. **Start from the nearest theme.** Copy its directory. `bin/demo themes`
@@ -105,12 +134,16 @@ the top of `theme.mjs`. `bin/demo theme <name>` previews with
    five moments through the scene card, a long title with no keys, three
    keys with no step or subtitle, the intro card, the phone frame, the end
    card settled and again 40 beats later, the key hint, and the splash.
+   Then read the transition findings at the end of the output (see
+   Transitions) and fix them before a build.
 5. **Finish with a real run.** `MUSIC=<track> bin/demo all projects/example --dry`
    records the example project with silent narration in about two minutes
    (set `theme` in `projects/example/project.mjs` or pass a project that
    uses the theme), then pull frames with
    `ffmpeg -ss <t> -i projects/example/build/notes-demo.mp4 -frames:v 1 out.png`
-   at a card's hero moment and at a cut.
+   at a card's hero moment and at a cut, or run
+   `bin/demo review projects/example` for strips of every card transition
+   in `projects/example/build/review/`.
 
 ## Checklist before you call it done
 
@@ -124,6 +157,8 @@ the top of `theme.mjs`. `bin/demo theme <name>` previews with
   covers the page.
 - Out shots (04, 05): the page underneath is revealed cleanly; no
   leftover element lingers after the card has gone.
+- Transitions: `bin/demo theme` reports no problem: no exit, exit too
+  small, grey wash and cut between two cards are all gone.
 - End card (10, 11): identical except for anything deliberately looping,
   such as a cursor. The URL is the most readable thing on it.
 - Key hint (12): visible over a light page and a dark one.
@@ -141,4 +176,6 @@ the top of `theme.mjs`. `bin/demo theme <name>` previews with
 - `lib/plan.py` sets the timing envelope: `cardBeats` (8 = 2 in, 4 hold,
   2 out), intro, outro and end card rules.
 - `lib/splash-html.mjs` fills the splash template; `lib/splash.mjs` renders it.
-- `lib/theme-preview.mjs` is the preview harness.
+- `lib/theme-preview.mjs` is the preview harness; `lib/transition-checks.mjs`
+  and `lib/luma.mjs` judge the transitions; `lib/review.mjs` reviews a
+  built video.

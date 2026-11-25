@@ -42,6 +42,7 @@ bin/demo record   projects/my-video   # -> build/frames, build/record.log
 bin/demo assemble projects/my-video   # -> build/<name>.mp4
 bin/demo check    projects/my-video   # loudness of each narration window
 bin/demo splash   projects/my-video   # -> build/<name>-splash.png
+bin/demo review   projects/my-video   # card transitions of the video -> build/review/
 ```
 
 `bin/demo build <project>` runs plan, record, assemble and check. `bin/demo all <project>` runs everything. Everything lands in the project's `build/` directory, which git ignores, and each command also leaves its output in `build/<command>.log` (the previous one in `build/<command>.prev.log`).
@@ -69,7 +70,20 @@ A theme owns the look: the scene cards, the end card, the key hint and the splas
 
 Pick one in `project.mjs` with `theme: 'paper'`, override tokens with `theme: { name: 'paper', colors: { accent: '#0a7' } }`, or point at a theme directory of your own with `theme: './my-theme'`. A theme may offer options: the temporal theme has three wipes, chosen with `theme: { name: 'temporal', options: { wipe: 'fail' } }` (`rail` sweeps the timeline across; `fail` stops it on a failed activity, shakes, and runs the retry on to the rail until the row completes with the UI's failed-to-completed gradient; `signal` lands a signal on the title and the title grows out of the spot; or `cycle` to rotate), and any scene can pick its own with `card: { wipe: 'rail' }`. The `fail` wipe takes four beats and `signal` five, and either falls back to `rail` when the card's hold is shorter than the wipe minus one beat, so give such a project a longer card with `timing: { cardBeats: 12, holdBeats: 8 }`. The end card uses `rail` unless its scene names a wipe. The theme also has a light mode, `theme: { name: 'temporal', options: { mode: 'light' } }`, and two rest states behind the title, `rest: 'axis'` (the UI's time-axis ticks, the default) or `rest: 'stars'`; a scene can pick its own with `card: { rest: 'stars' }`. The splash always draws the axis. The fail wipe captions its retry `Attempt 2`, the UI's wording; change it with `options: { retryLabel: 'second try' }` or per scene with `card: { retryLabel: 'second try' }`, or drop it with `retryLabel: null`. On the end card the key caps are outlined and the axis ticks drift slowly.
 
-`bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` in the current folder, with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys, into `<project>/build/themes/<name>-<project name>/`. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
+`bin/demo theme <name>` renders a theme's cards, end card, key hint and splash to `build/themes/<name>/` in the current folder, with a contact sheet, in a few seconds and without a recording. `bin/demo theme <name> <project>` does the same with that project's words and keys, into `<project>/build/themes/<name>-<project name>/`.
+
+`bin/demo theme` also checks the scene card's transitions. It plays the card's entry and exit at 12 fps over a light page and a dark one, and the handover to the next card for a theme with `handover: true`, writes a strip of frames for each to `transitions/` in the same folder, and the findings to `transitions.md`. The output ends with the number of problems and the report's path. It reports:
+
+- **no exit**: nothing on the card moves when it leaves, only the whole card fades.
+- **exit too small**: the largest move is under 60 px, or the exit lasts under 0.3 s.
+- **grey wash**: a middle frame of the entry or the exit is an opacity fade between a light frame and a dark one, with much less contrast than the two ends. A light card faded over a dark page goes grey; slide it or wipe it instead.
+- **cut between two cards**: the theme does not declare `handover: true`, so one title card cuts to the next.
+
+The checks report and do not fail the command, so a theme in progress still renders.
+
+## Review a video
+
+`bin/demo review <project>`, after a build, reads `build/<name>.mp4`, `build/plan.json` and `build/record.log`, and writes to `build/review/` a strip of frames at 12 fps for each card entry, each card exit and each card-to-card handover (`<scene>-entry.png`, `<scene>-exit.png`, `<scene>-handover.png`), and `report.md`. The report names each strip with its scene and its start time in the video, the grey washes in the strips, each scene that started late, and each page shown less than 2 seconds between two cards. It prints the report too. With no built video, it says to run `bin/demo build` first and fails. To build a new theme, see `.claude/skills/demo-theme/SKILL.md`: it holds the contract and a checklist, and an agent working in this repository picks it up on its own.
 
 ## A project
 
@@ -153,4 +167,4 @@ Records Cloud UI. Set `BASE_URL` (default `http://localhost:3000`) and `NAMESPAC
 
 ## Releases
 
-`scripts/release.sh 0.2.0` writes `VERSION`, tags `v0.2.0`, pushes the tag, and writes the tag archive's `url` and `sha256` into `Formula/demo-video.rb` of the tap checkout (`TAP_DIR`, default `../homebrew-tools`). Commit and push the tap after it. `tests/cli_test.sh` and `tests/release_test.sh` test the command and the release script.
+`scripts/release.sh 0.2.0` writes `VERSION`, tags `v0.2.0`, pushes the tag, and writes the tag archive's `url` and `sha256` into `Formula/demo-video.rb` of the tap checkout (`TAP_DIR`, default `../homebrew-tools`). Commit and push the tap after it. `tests/cli_test.sh` and `tests/release_test.sh` test the command and the release script; `tests/transition_test.sh` tests the transition checks and `review`.

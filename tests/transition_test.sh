@@ -135,5 +135,12 @@ out=$(demo review empty 2>&1); status=$?
 expect "says to build first" "$out" "run bin/demo build empty first"
 if [ "$status" -ne 0 ]; then pass "exits with an error"; else fail "exits with an error" "$out"; fi
 
+echo "the rules in the skill and the README (R6.S1, R6.S2)"
+skill=$(cat "$root/.claude/skills/demo-theme/SKILL.md")
+expect "the skill has the four rules" "$skill" "Every card needs an exit that mirrors its entry" "Never fade a light layer over a dark page with opacity" "Slide it off or wipe it" 'Declare `handover: true`' 'Check with `bin/demo theme` before a build'
+readme=$(cat "$root/README.md")
+expect "the README names both commands" "$readme" "bin/demo review <project>" "transitions.md" "no exit" "grey wash" "cut between two cards" "build/review/"
+expect "the usage names both" "$("$root/bin/demo" --help)" "review " "check its transitions"
+
 printf '\n%d passed, %d failed\n' "$passes" "$fails"
 [ "$fails" -eq 0 ]

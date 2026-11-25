@@ -30,7 +30,7 @@ version=$(cat "$root/VERSION")
 echo "version and help (R1.S1)"
 expect "--version" "$(dv --version)" "demo-video $version"
 help=$(dv --help)
-expect "--help lists every command" "$help" "demo-video <command>" setup doctor --version new show narrate beats plan record assemble check splash build all themes "theme <name> [project]"
+expect "--help lists every command" "$help" "demo-video <command>" setup doctor --version new show narrate beats plan record assemble check splash review build all themes "theme <name> [project]"
 expect "the formula's wrapper name" "$(DEMO_VIDEO_NAME=demo-video "$root/bin/demo" --help; DEMO_VIDEO_NAME=demo-video "$root/bin/demo" nope 2>&1)" "demo-video <command>" "demo-video nope: which project directory?"
 
 echo "a new project outside the checkout (R1.S2)"

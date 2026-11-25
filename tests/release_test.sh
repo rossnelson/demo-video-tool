@@ -44,6 +44,14 @@ if out=$(release 0.2.0); then fail "a dirty tree fails" "$out"; else
 fi
 rm "$tmp/repo/dirty.txt"
 
+# main behind origin/main (a PR merged on GitHub, not pulled): stop before any tag.
+git clone -q "$tmp/remote.git" "$tmp/other" && (cd "$tmp/other" && echo x > merged.txt && git add merged.txt && git commit -qm merged && git push -q origin main)
+before=$(state)
+if out=$(release 0.2.0); then fail "main behind origin/main fails" "$out"; else
+  git --git-dir="$tmp/remote.git" rev-parse -q --verify refs/tags/v0.2.0 >/dev/null && fail "main behind origin/main published a tag" || pass "main behind origin/main fails and publishes no tag"
+fi
+(cd "$tmp/repo" && git pull -q origin main)
+
 echo "a release updates the formula (R5.S1)"
 out=$(release 0.2.0); status=$?
 [ "$status" -eq 0 ] && pass "release 0.2.0 succeeds" || fail "release 0.2.0 succeeds" "$out"

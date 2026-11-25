@@ -28,12 +28,17 @@ cd "$root"
 [ "$(git rev-parse --abbrev-ref HEAD)" = main ] || die "release from main, not $(git rev-parse --abbrev-ref HEAD)"
 [ -z "$(git status --porcelain)" ] || die "the working tree has changes: commit or remove them first"
 ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "the tag $tag exists"
+# Tag what is on GitHub's main: a local main behind it (a PR merged on GitHub
+# and not pulled) would tag the wrong commit.
+git fetch -q origin main
+[ "$(git rev-parse main)" = "$(git rev-parse origin/main)" ] || die "main is not the same as origin/main: pull (or push) first"
 
 echo "$version" > VERSION
 git add VERSION
 git commit -qm "Release $tag" || true   # VERSION may already say $version
 git tag -a "$tag" -m "demo-video $version"
-git push -q origin main "$tag"
+# --atomic: the tag is not published when the push of main fails.
+git push -q --atomic origin main "$tag"
 
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 curl -fsSL --retry 3 -o "$tmp/archive.tar.gz" "$archive_url"

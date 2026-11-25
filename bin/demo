@@ -32,7 +32,9 @@ while [ -L "$self" ]; do
   link=$(readlink "$self")
   case $link in /*) self=$link ;; *) self=$(dirname "$self")/$link ;; esac
 done
-root=$(cd "$(dirname "$self")/.." && pwd)
+# pwd -P: the real path, as node sees its own files (a symlinked folder such
+# as /tmp on macOS would otherwise break lib/project.mjs's main check).
+root=$(cd "$(dirname "$self")/.." && pwd -P)
 lib="$root/lib"
 # The name to show: the formula's wrapper sets DEMO_VIDEO_NAME, because it runs
 # this file as libexec/bin/demo; a symlink or a checkout gives it in $0.
@@ -40,6 +42,8 @@ me=${DEMO_VIDEO_NAME:-$(basename "$0")}
 
 # Per-user data: the beat tracker's venv and Playwright with Chromium.
 export DEMO_VIDEO_HOME="${DEMO_VIDEO_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/demo-video}"
+# Absolute: node's createRequire and doctor (which changes folder) need it.
+case $DEMO_VIDEO_HOME in /*) ;; *) DEMO_VIDEO_HOME="$PWD/$DEMO_VIDEO_HOME" ;; esac
 
 # The usage is the comment block at the top: every line from 2 to the first
 # line that is not a comment.

@@ -89,6 +89,12 @@ echo "a tool folder with a space in its path"
 cp -R "$root/bin" "$root/lib" "$root/VERSION" "$tmp/with space/" 2>/dev/null || { mkdir -p "$tmp/with space" && cp -R "$root/bin" "$root/lib" "$root/VERSION" "$tmp/with space/"; }
 expect "themes from a folder with a space" "$(cd "$tmp/work" && "$tmp/with space/bin/demo" themes 2>&1)" slant paper
 
+echo "a relative DEMO_VIDEO_HOME, and a tool path through a symlinked folder"
+out=$(cd "$tmp" && DEMO_VIDEO_HOME=data node -e '' && DEMO_VIDEO_HOME=data "$tmp/bin/demo-video" doctor 2>&1)
+expect "a relative DEMO_VIDEO_HOME is made absolute" "$out" "data folder: $tmp/data"
+ln -s "$tmp/with space" "$tmp/linked"
+expect "show through a symlinked folder" "$(cd "$tmp/work" && "$tmp/linked/bin/demo" show "my video" 2>&1)" '"name": "notes-demo"'
+
 echo "a per-user ElevenLabs key (R3.S1)"
 # A project with one line, and a urlopen stub that prints the key it was sent.
 mkdir -p "$tmp/keyproj" "$tmp/stub"

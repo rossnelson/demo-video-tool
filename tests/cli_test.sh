@@ -81,6 +81,8 @@ expect "doctor lists what is missing" "$out" "missing  playwright" "missing  Ele
 [ -x "$root/.venv/bin/python" ] || expect "doctor lists the beat tracker" "$out" "missing  beat tracker"
 
 mkdir -p "$tmp/keyed"; echo "k" > "$tmp/keyed/.el-key"
+mkdir -p "$tmp/blank"; echo "" > "$tmp/blank/.el-key"
+expect "doctor: a blank .el-key is no key" "$(DEMO_VIDEO_HOME="$tmp/empty" dv doctor "$tmp/blank" 2>&1)" "missing  ElevenLabs key"
 expect "doctor finds a project's .el-key" "$(DEMO_VIDEO_HOME="$tmp/empty" dv doctor "$tmp/keyed" 2>&1)" "found    ElevenLabs key $tmp/keyed/.el-key"
 
 echo "a tool folder with a space in its path"

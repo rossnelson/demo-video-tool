@@ -11,7 +11,7 @@ pass() { passes=$((passes + 1)); printf '  ok    %s\n' "$1"; }
 fail() { fails=$((fails + 1)); printf '  FAIL  %s\n' "$1"; [ -z "${2:-}" ] || printf '%s\n' "$2" | head -12 | sed 's/^/        /'; }
 
 export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=test@example.com GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=test@example.com
-git init -q --bare "$tmp/remote.git"
+git init -q --bare -b main "$tmp/remote.git"
 git init -q -b main "$tmp/repo"
 mkdir -p "$tmp/repo/scripts"
 cp "$root/scripts/release.sh" "$tmp/repo/scripts/"
@@ -52,6 +52,16 @@ if out=$(release 0.2.0); then fail "main behind origin/main fails" "$out"; else
 fi
 (cd "$tmp/repo" && git pull -q origin main)
 
+# A push that the remote rejects: nothing published, nothing left here, and it can run again.
+printf '#!/bin/sh\nexit 1\n' > "$tmp/remote.git/hooks/pre-receive"; chmod +x "$tmp/remote.git/hooks/pre-receive"
+head_before=$(cd "$tmp/repo" && git rev-parse HEAD)
+if out=$(release 0.2.0); then fail "a rejected push fails" "$out"; else
+  if (cd "$tmp/repo" && ! git rev-parse -q --verify refs/tags/v0.2.0 >/dev/null && [ "$(git rev-parse HEAD)" = "$head_before" ]); then
+    pass "a rejected push leaves no local tag or commit"
+  else fail "a rejected push leaves no local tag or commit"; fi
+fi
+rm "$tmp/remote.git/hooks/pre-receive"
+
 echo "a release updates the formula (R5.S1)"
 out=$(release 0.2.0); status=$?
 [ "$status" -eq 0 ] && pass "release 0.2.0 succeeds" || fail "release 0.2.0 succeeds" "$out"
@@ -61,7 +71,11 @@ git --git-dir="$tmp/remote.git" rev-parse -q --verify refs/tags/v0.2.0 >/dev/nul
 f=$(cat "$tmp/tap/Formula/demo-video.rb")
 grep -qF 'url "https://github.com/o/r/archive/refs/tags/v0.2.0.tar.gz"' <<<"$f" && pass "the formula has the tag's url" || fail "the formula has the tag's url" "$f"
 grep -qF "sha256 \"$want_sha\"" <<<"$f" && pass "the formula has the archive's sha256" || fail "the formula has the archive's sha256" "$f"
-release 0.2.0 >/dev/null && fail "the same tag again fails" || pass "the same tag again fails"
+# The same version again: the tag is published, so only the formula is written.
+sed -i.bak -E 's|^(  sha256 ").*(")$|\1old\2|' "$tmp/tap/Formula/demo-video.rb" && rm "$tmp/tap/Formula/demo-video.rb.bak"
+out=$(release 0.2.0)
+grep -qF "sha256 \"$want_sha\"" "$tmp/tap/Formula/demo-video.rb" && pass "a run after a published tag writes the formula only" || fail "a run after a published tag writes the formula only" "$out"
+[ "$(git --git-dir="$tmp/remote.git" tag | grep -c v0.2.0)" = 1 ] && pass "no second tag" || fail "no second tag"
 
 echo
 echo "$passes passed, $fails failed"

@@ -27,18 +27,31 @@ cd "$root"
 [ -f "$formula" ] || die "no formula at $formula: set TAP_DIR to the tap checkout"
 [ "$(git rev-parse --abbrev-ref HEAD)" = main ] || die "release from main, not $(git rev-parse --abbrev-ref HEAD)"
 [ -z "$(git status --porcelain)" ] || die "the working tree has changes: commit or remove them first"
-! git rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "the tag $tag exists"
 # Tag what is on GitHub's main: a local main behind it (a PR merged on GitHub
 # and not pulled) would tag the wrong commit.
-git fetch -q origin main
+git fetch -q --tags origin main
 [ "$(git rev-parse main)" = "$(git rev-parse origin/main)" ] || die "main is not the same as origin/main: pull (or push) first"
 
-echo "$version" > VERSION
-git add VERSION
-git commit -qm "Release $tag" || true   # VERSION may already say $version
-git tag -a "$tag" -m "demo-video $version"
-# --atomic: the tag is not published when the push of main fails.
-git push -q --atomic origin main "$tag"
+if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+  # The tag is published (an earlier run stopped after the push): only write
+  # the formula, and only when the tag is on main.
+  git merge-base --is-ancestor "$tag" main || die "the tag $tag exists and is not on main"
+  echo "The tag $tag is published; writing the formula only."
+else
+  ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "the tag $tag exists here but not on origin: remove it (git tag -d $tag)"
+  start=$(git rev-parse HEAD)
+  echo "$version" > VERSION
+  git add VERSION
+  git commit -qm "Release $tag" || true   # VERSION may already say $version
+  git tag -a "$tag" -m "demo-video $version"
+  # --atomic: the tag is not published when the push of main fails. Then undo
+  # the local commit and tag, so the release can run again.
+  if ! git push -q --atomic origin main "$tag"; then
+    git tag -d "$tag" >/dev/null
+    git reset -q --hard "$start"
+    die "the push was rejected; nothing was published"
+  fi
+fi
 
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 curl -fsSL --retry 3 -o "$tmp/archive.tar.gz" "$archive_url"

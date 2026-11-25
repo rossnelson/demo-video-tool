@@ -4,7 +4,21 @@ Makes a narrated product video from a browser: a screen recording with ElevenLab
 
 `projects/command-palette/` is the Temporal Cloud command palette intro. `projects/example/` records a small local page and is the template for new projects. `projects/meta/` is the tool's own demo: a video about the tool, made with it, that shows its own project file and the build's logs between the cards, each scene's card in a different theme.
 
+The site, with a guide and a reference: https://rossnelson.github.io/demo-video-tool/
+
 ## What you need
+
+Install the `demo-video` command with Homebrew, then let it install the rest:
+
+```
+brew install spec-studio-app/tap/demo-video   # ffmpeg, node and python come with it
+demo-video setup                              # the beat tracker and Playwright with Chromium
+demo-video doctor                             # what is found, what is missing
+```
+
+`setup` puts the beat tracker's Python environment and Playwright in `~/.local/share/demo-video` (or `$DEMO_VIDEO_HOME`). Put the ElevenLabs key in `ELEVENLABS_API_KEY`, a project's `.el-key`, or `~/.config/demo-video/el-key`. The installed command takes the same commands as `bin/demo` below: `demo-video all my-video` is `bin/demo all my-video`.
+
+To work on the tool itself, from a checkout:
 
 - `ffmpeg`, `ffprobe`, Node 20+ and Python 3.
 - Playwright with Chromium. The cloud image has it; elsewhere `npm install -g playwright && npx playwright install chromium`, or set `PLAYWRIGHT_DIR` to a checkout that has it.
@@ -134,3 +148,7 @@ Records Cloud UI. Set `BASE_URL` (default `http://localhost:3000`) and `NAMESPAC
 - Voice: ElevenLabs `cBTYF7NiJbR8Bvmdeuse`, model `eleven_multilingual_v2`, stability 0.45, similarity 0.8, style 0.35, speaker boost on. `VOICE_ID` overrides the voice.
 - Mix: each narration clip at -16 LUFS, the music at -27 LUFS. The music ducks under the voice and fades over the last two bars.
 - `el.sh <endpoint>` calls the ElevenLabs API with your key, for looking up voices or usage.
+
+## Releases
+
+`scripts/release.sh 0.2.0` writes `VERSION`, tags `v0.2.0`, pushes the tag, and writes the tag archive's `url` and `sha256` into `Formula/demo-video.rb` of the tap checkout (`TAP_DIR`, default `../homebrew-tap`). Commit and push the tap after it. `tests/cli_test.sh` and `tests/release_test.sh` test the command and the release script.

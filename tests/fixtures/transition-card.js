@@ -5,6 +5,7 @@
 //   wipe   a clip-path wipe of the card, no move
 //   slide  the card slides in from below and off the top, no opacity
 //   bob    the whole card fades out while its title bobs 12 px all along (no exit)
+//   wrapbob the card's content fades out as one, while its title bobs (no exit)
 //   bobmove the title bobs 12 px all along, then rises 100 px as the card leaves (an exit)
 //   quick  the title, then the subtitle, jump up 100 px in 0.15 s each (exit too small)
 // With opts.keep, the slide card's words leave and the paper stays; with
@@ -41,6 +42,9 @@ h1{margin:0;font-size:96px}p{margin:0;font-size:36px;font-weight:400;color:#4d4a
       small: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}
 h1{${leave ? `animation:lift ${1.5 * B}ms ease-in ${out}ms forwards` : ''}}`,
       bob: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}
+h1{animation:bob ${1.3 * B}ms ease-in-out infinite alternate}`,
+      wrapbob: `.demo{animation:fadeIn ${B}ms ease forwards}
+.card{${leave ? `animation:fadeOut ${1.5 * B}ms ease ${out}ms forwards` : ''}}
 h1{animation:bob ${1.3 * B}ms ease-in-out infinite alternate}`,
       bobmove: `.demo{animation:fadeIn ${B}ms ease forwards${leave ? `, fadeOut ${0.4 * B}ms ease ${out + 1.6 * B}ms forwards` : ''}}
 h1{animation:bob ${1.3 * B}ms ease-in-out infinite alternate${leave ? `, rise ${1.5 * B}ms ease-in ${out}ms forwards` : ''}}`,

@@ -51,6 +51,7 @@ theme slide slide true
 theme bob bob
 theme quick quick
 theme bobmove bobmove
+theme wrapbob wrapbob
 
 echo "a theme with only a whole-card fade (R1.S1, R2.S1, R4.S1)"
 out=$(demo theme ./themes/fade 2>&1)
@@ -76,6 +77,10 @@ echo "a whole-card fade with a bobbing title (R1.S1)"
 out=$(demo theme ./themes/bob 2>&1)
 expect "a bob is not an exit" "$out" "no exit: nothing on the card moves"
 refuse "and not too small" "$out" "exit too small"
+
+echo "content that fades as one while its title bobs (R1.S1)"
+out=$(demo theme ./themes/wrapbob 2>&1)
+expect "one fade with a bob is no exit" "$out" "no exit: nothing on the card moves"
 
 echo "a bobbing title that then rises 100 px (R1)"
 refuse "the rise is a good exit" "$(demo theme ./themes/bobmove 2>&1)" "no exit" "exit too small"

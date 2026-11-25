@@ -102,7 +102,7 @@ else
 fi
 
 echo "the README says how to install (R7.S1)"
-expect "README" "$(cat "$root/README.md")" "brew install spec-studio-app/tap/demo-video" "demo-video setup"
+expect "README" "$(cat "$root/README.md")" "brew install rossnelson/tools/demo-video" "demo-video setup"
 
 echo
 echo "$passes passed, $fails failed"

@@ -16,7 +16,7 @@
 | Repo | Why it changes | Merge order |
 |---|---|---|
 | demo-video-tool | The CLI, setup, doctor, release script, site, README | 1 |
-| homebrew-tap | The `demo-video` formula and its README row | 2 |
+| homebrew-tools | The `demo-video` formula and its README (a new tap) | 2 |
 
 ## Steps
 1. demo-video-tool: `bin/demo` resolves its root through symlinks, adds `VERSION` (0.1.0), `--version`, `setup` and `doctor` in the usage, quotes every path, and names itself by `$0`'s base name; `lib/theme-preview.mjs` writes into the current folder's or the project's `build/themes/`. Covers R1.
@@ -26,7 +26,7 @@
 5. demo-video-tool: `scripts/release.sh <version>` with `TAP_DIR`, its checks, and its test in `tests/release_test.sh` against a temp git repo and a temp tap. Covers R5.
 6. demo-video-tool: the SvelteKit site in `site/`, its Playwright tests, and `.github/workflows/site.yml`. Covers R6.
 7. demo-video-tool: the README starts "What you need" with the Homebrew install, `demo-video setup`, `demo-video doctor` and the site link. Covers R7.
-8. homebrew-tap: `Formula/demo-video.rb` and a row in the tap's README. Covers R4.
+8. homebrew-tools: `Formula/demo-video.rb` and a row in the tap's README. Covers R4.
 
 ## Tests
 - R1.S1: `tests/cli_test.sh` runs `bin/demo --version` and `--help` through a symlink named `demo-video` and checks the version and the `setup` and `doctor` lines.
@@ -37,7 +37,7 @@
 - R2.S2: `tests/cli_test.sh` puts a stub `venv/bin/python` in a temp `DEMO_VIDEO_HOME` and checks that `demo-video beats` calls it; a node one-liner checks `lib/playwright.mjs` resolves Playwright from a temp `DEMO_VIDEO_HOME` with a stub `node_modules/playwright`.
 - R2.S3: `tests/cli_test.sh` runs `demo-video doctor` with an empty `DEMO_VIDEO_HOME` and no key, and checks the missing lines and the non-zero exit.
 - R3.S1: `tests/cli_test.sh` writes a key to a temp `XDG_CONFIG_HOME` and checks `narrate` gets past the key check (a stub `ELEVENLABS` URL is not called: the test uses a project with no scenes to narrate); with no key, it checks the error names all three places.
-- R4.S1: after the first release, `brew install spec-studio-app/tap/demo-video` and `brew test demo-video`; during the build, `brew style` and `brew audit --formula` on the formula, and an install from a local copy of the tap with a formula pointed at a local archive.
+- R4.S1: after the first release, `brew install rossnelson/tools/demo-video` and `brew test demo-video`; during the build, `brew style` and `brew audit --formula` on the formula, and an install from a local copy of the tap with a formula pointed at a local archive.
 - R4.S2: during the build, `brew install --HEAD` from a local tap whose `head` points at the worktree, then `demo-video --version`.
 - R4.S3: the caveats show after the local install; `brew info` prints them.
 - R5.S1: `tests/release_test.sh` runs the script against a temp clone with a bare remote and a temp tap, with the archive download pointed at a local `git archive` file, and checks the tag, `VERSION`, the `url` and the `sha256`.
@@ -53,7 +53,7 @@
 ## Risks
 - `librosa` may not install on the newest Python Homebrew ships: the formula pins `python@3.12`, and `setup` uses the Python first on the PATH, which the env script sets.
 - Playwright's Chromium download is large and fails offline: `setup` prints the failed step, and `doctor` reports it.
-- The tap name relies on the canonical `spec-studio-app/tap`; the summary tells the user, so they can move the formula if they want a `rossnelson` tap.
+- The tap is a new repo, `rossnelson/homebrew-tools`, which the user chose; the formula first went to `spec-studio-app/homebrew-tap` and that PR was closed.
 - The site's base path breaks links if a page uses a bare `/`: every link goes through `resolve()` from `$app/paths`, and the crawl test catches a miss.
 - GitHub Pages is off until the user enables it: the deploy job fails until then, and the summary says so.
 - The repo has no LICENSE; the formula leaves out `license`, and the summary asks the user to choose one.

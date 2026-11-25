@@ -7,7 +7,7 @@ Today the demo video tool runs only from a checkout of this repo, through `bin/d
 ### In scope
 - An installed command `demo-video` with the same commands as `bin/demo`, plus `--version`, `setup` and `doctor`.
 - Per-user locations for what the checkout held: the beat tracker's Python environment, Playwright with Chromium, and the ElevenLabs key.
-- A `demo-video` formula in the Homebrew tap (local clone `~/code/homebrew-tap`).
+- A `demo-video` formula in the Homebrew tap (local clone `~/code/homebrew-tools`).
 - A release script that tags a version and writes the formula's `url` and `sha256` for it.
 - A SvelteKit static site in `site/`, built and deployed to GitHub Pages by a workflow.
 - An Install section in the README.
@@ -84,13 +84,13 @@ The tap has a `demo-video` formula that installs the tool with its runtime depen
 
 #### R4.S1 Install from the tap
 - Given the formula is in the tap and a release exists for its version
-- When the user runs `brew install spec-studio-app/tap/demo-video`
+- When the user runs `brew install rossnelson/tools/demo-video`
 - Then `demo-video --version` prints that version
 - And the formula's test passes under `brew test demo-video`
 
 #### R4.S2 Install from the main branch
 - Given the formula is in the tap
-- When the user runs `brew install --HEAD spec-studio-app/tap/demo-video`
+- When the user runs `brew install --HEAD rossnelson/tools/demo-video`
 - Then `demo-video --version` prints the version from the main branch
 
 #### R4.S3 The caveats say what comes next
@@ -102,7 +102,7 @@ The tap has a `demo-video` formula that installs the tool with its runtime depen
 `scripts/release.sh <version>` writes `VERSION`, commits, tags `v<version>`, pushes the tag, and writes the tag's archive `url` and `sha256` into the formula of a local tap checkout.
 
 #### R5.S1 A release updates the formula
-- Given a clean main branch and a tap checkout at `$TAP_DIR` (default `../homebrew-tap`)
+- Given a clean main branch and a tap checkout at `$TAP_DIR` (default `../homebrew-tools`)
 - When the user runs `scripts/release.sh 0.2.0`
 - Then the repo has the tag `v0.2.0` with `VERSION` at `0.2.0`
 - And the tap's formula has the `url` of the `v0.2.0` archive and its `sha256`
@@ -119,7 +119,7 @@ A SvelteKit static site in `site/` explains what the tool makes, how to install 
 - Given the site is built
 - When a visitor opens the home page
 - Then it says what the tool makes in one sentence
-- And it shows the install command `brew install spec-studio-app/tap/demo-video` with a button that copies it
+- And it shows the install command `brew install rossnelson/tools/demo-video` with a button that copies it
 - And it links to the guide and the reference pages and to the GitHub repo
 
 #### R6.S2 A first video
@@ -154,7 +154,7 @@ The README starts its setup with the Homebrew install and `demo-video setup`, an
 #### R7.S1 Install in the README
 - Given the README
 - When a reader opens "What you need"
-- Then they see `brew install spec-studio-app/tap/demo-video` and `demo-video setup` first, and a link to the site
+- Then they see `brew install rossnelson/tools/demo-video` and `demo-video setup` first, and a link to the site
 
 ## Edge cases
 - A project path with spaces: every command quotes it.
@@ -165,7 +165,7 @@ The README starts its setup with the Homebrew install and `demo-video setup`, an
 - The site's install command and the formula name must match; a test checks the site's text against the formula name.
 
 ## Assumptions
-- The tap: `github.com/rossnelson/homebrew-tap` now redirects to `spec-studio-app/homebrew-tap`, the only tap that exists (local clone `~/code/homebrew-tap`). The formula goes there, and the docs use the canonical name `spec-studio-app/tap`. `brew tap rossnelson/tap` also works through the redirect, but a new `rossnelson/homebrew-tap` repo would break it.
+- The tap: a new public repo, `rossnelson/homebrew-tools` (local clone `~/code/homebrew-tools`), so the install is `brew install rossnelson/tools/demo-video`. The user chose this name so that the old `rossnelson/homebrew-tap` redirect to the Spec Studio tap keeps working.
 - The command is `demo-video`, not `demo`, because `demo` is too generic for a PATH. The formula has the same name.
 - The data folder is `${XDG_DATA_HOME:-~/.local/share}/demo-video`, overridden by `DEMO_VIDEO_HOME`; the key file is `${XDG_CONFIG_HOME:-~/.config}/demo-video/el-key`.
 - `setup` installs Playwright with npm into the data folder and runs its Chromium install. Homebrew cannot do this in the formula without a long list of resources, and `librosa` has heavy dependencies.

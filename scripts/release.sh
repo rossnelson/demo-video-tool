@@ -5,7 +5,7 @@
 #
 #   scripts/release.sh 0.2.0
 #
-#   TAP_DIR      the tap checkout (default: ../homebrew-tap next to this repo)
+#   TAP_DIR      the tap checkout (default: ../homebrew-tools next to this repo)
 #   REPO_URL     the GitHub repo (default: https://github.com/rossnelson/demo-video-tool)
 #   ARCHIVE_URL  where to download the archive from (default: the tag's archive on
 #                REPO_URL; the tests point it at a local file)
@@ -17,7 +17,7 @@ version=${1:-}
 [ -n "$version" ] || die "which version? scripts/release.sh 0.2.0"
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "the version is X.Y.Z, with no v: got $version"
 tag="v$version"
-tap=${TAP_DIR:-$root/../homebrew-tap}
+tap=${TAP_DIR:-$root/../homebrew-tools}
 formula="$tap/Formula/demo-video.rb"
 repo_url=${REPO_URL:-https://github.com/rossnelson/demo-video-tool}
 url="$repo_url/archive/refs/tags/$tag.tar.gz"

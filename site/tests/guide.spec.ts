@@ -5,7 +5,7 @@ test('the guide lists setup, new, a dry run and the narrated run, in that order'
 	await page.goto('./guide/');
 	const codes = await page.locator('.steps pre code').allTextContents();
 	const order = [
-		'brew install spec-studio-app/tap/demo-video',
+		'brew install rossnelson/tools/demo-video',
 		'demo-video setup',
 		'demo-video doctor',
 		'demo-video new my-video',

@@ -11,7 +11,7 @@ The site, with a guide and a reference: https://rossnelson.github.io/demo-video-
 Install the `demo-video` command with Homebrew, then let it install the rest:
 
 ```
-brew install spec-studio-app/tap/demo-video   # ffmpeg, node and python come with it
+brew install rossnelson/tools/demo-video   # ffmpeg, node and python come with it
 demo-video setup                              # the beat tracker and Playwright with Chromium
 demo-video doctor                             # what is found, what is missing
 ```
@@ -151,4 +151,4 @@ Records Cloud UI. Set `BASE_URL` (default `http://localhost:3000`) and `NAMESPAC
 
 ## Releases
 
-`scripts/release.sh 0.2.0` writes `VERSION`, tags `v0.2.0`, pushes the tag, and writes the tag archive's `url` and `sha256` into `Formula/demo-video.rb` of the tap checkout (`TAP_DIR`, default `../homebrew-tap`). Commit and push the tap after it. `tests/cli_test.sh` and `tests/release_test.sh` test the command and the release script.
+`scripts/release.sh 0.2.0` writes `VERSION`, tags `v0.2.0`, pushes the tag, and writes the tag archive's `url` and `sha256` into `Formula/demo-video.rb` of the tap checkout (`TAP_DIR`, default `../homebrew-tools`). Commit and push the tap after it. `tests/cli_test.sh` and `tests/release_test.sh` test the command and the release script.

@@ -77,6 +77,21 @@ out=$(release 0.2.0)
 grep -qF "sha256 \"$want_sha\"" "$tmp/tap/Formula/demo-video.rb" && pass "a run after a published tag writes the formula only" || fail "a run after a published tag writes the formula only" "$out"
 [ "$(git --git-dir="$tmp/remote.git" tag | grep -c v0.2.0)" = 1 ] && pass "no second tag" || fail "no second tag"
 
+echo "a later release, then the older one again"
+out=$(release 0.3.0) && pass "release 0.3.0" || fail "release 0.3.0" "$out"
+cp "$tmp/tap/Formula/demo-video.rb" "$tmp/formula.before"
+release 0.2.0 >/dev/null 2>&1 && fail "an older published version fails" || { cmp -s "$tmp/formula.before" "$tmp/tap/Formula/demo-video.rb" && pass "an older published version fails and keeps the formula" || fail "an older version changed the formula"; }
+
+echo "a failed release commit"
+printf '#!/bin/sh\nexit 1\n' > "$tmp/repo/.git/hooks/pre-commit"; chmod +x "$tmp/repo/.git/hooks/pre-commit"
+head_before=$(cd "$tmp/repo" && git rev-parse HEAD)
+if out=$(release 0.4.0); then fail "a failed commit stops the release" "$out"; else
+  (cd "$tmp/repo" && [ "$(git rev-parse HEAD)" = "$head_before" ] && [ -z "$(git status --porcelain)" ] && ! git rev-parse -q --verify refs/tags/v0.4.0 >/dev/null) \
+    && ! git --git-dir="$tmp/remote.git" rev-parse -q --verify refs/tags/v0.4.0 >/dev/null \
+    && pass "a failed commit stops the release, tags nothing and leaves a clean tree" || fail "a failed commit left something"
+fi
+rm "$tmp/repo/.git/hooks/pre-commit"
+
 echo
 echo "$passes passed, $fails failed"
 [ "$fails" -eq 0 ]

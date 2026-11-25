@@ -36,13 +36,19 @@ if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; the
   # The tag is published (an earlier run stopped after the push): only write
   # the formula, and only when the tag is on main.
   git merge-base --is-ancestor "$tag" main || die "the tag $tag exists and is not on main"
+  # Only the latest release: an older version would put the formula back.
+  [ "$(cat VERSION)" = "$version" ] || die "the tag $tag exists, and main is at $(cat VERSION): release a new version"
   echo "The tag $tag is published; writing the formula only."
 else
   ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "the tag $tag exists here but not on origin: remove it (git tag -d $tag)"
   start=$(git rev-parse HEAD)
   echo "$version" > VERSION
   git add VERSION
-  git commit -qm "Release $tag" || true   # VERSION may already say $version
+  # No commit when VERSION already says $version; any other failure of the
+  # commit (a hook, signing) stops the release before the tag.
+  if ! git diff --cached --quiet; then
+    git commit -qm "Release $tag" || { git reset -q --hard "$start"; die "the release commit failed; nothing was tagged"; }
+  fi
   git tag -a "$tag" -m "demo-video $version"
   # --atomic: the tag is not published when the push of main fails. Then undo
   # the local commit and tag, so the release can run again.

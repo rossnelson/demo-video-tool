@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Meta from '#lib/Meta.svelte';
 	import BeatRuler from '#lib/BeatRuler.svelte';
 	import CodeBlock from '#lib/CodeBlock.svelte';
 	import { install, repo } from '#lib/install.ts';
@@ -36,13 +37,11 @@
 	];
 </script>
 
-<svelte:head>
-	<title>demo-video: narrated product videos, cut on the beat</title>
-	<meta
-		name="description"
-		content="demo-video makes a narrated product video from a browser: a screen recording, ElevenLabs narration, title cards and a music bed, with every cut on a downbeat."
-	/>
-</svelte:head>
+<Meta
+	title="demo-video: narrated product videos, cut on the beat"
+	description="demo-video makes a narrated product video from a browser: a screen recording, ElevenLabs narration, title cards and a music bed, with every cut on a downbeat."
+	route="/"
+/>
 
 <section class="hero">
 	<div class="copy">

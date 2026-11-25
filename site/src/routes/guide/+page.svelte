@@ -12,9 +12,9 @@
 };`;
 
 	const key = `export ELEVENLABS_API_KEY=sk_…                # this shell only
+echo 'sk_…' > my-video/.el-key                  # this project only
 mkdir -p ~/.config/demo-video
-echo 'sk_…' > ~/.config/demo-video/el-key       # every project
-echo 'sk_…' > my-video/.el-key                  # this project only`;
+echo 'sk_…' > ~/.config/demo-video/el-key       # every project`;
 
 	const outputs: [string, string, string][] = [
 		['narrate', 'build/audio/, build/durations.json', 'one clip per scene, and how long each one is'],
@@ -23,7 +23,7 @@ echo 'sk_…' > my-video/.el-key                  # this project only`;
 		['record', 'build/frames/, build/record.log', 'the screen recording, and when each scene ended'],
 		['assemble', 'build/<name>.mp4', 'the finished video'],
 		['splash', 'build/<name>-splash.png', 'a still image for a page or a post'],
-		['theme', 'build/themes/<theme>/', 'a preview of a theme’s cards, with a contact sheet']
+		['theme', 'build/themes/<theme>-<name>/', 'a preview of a theme’s cards, with a contact sheet']
 	];
 </script>
 

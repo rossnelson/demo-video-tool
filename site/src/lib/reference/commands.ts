@@ -13,8 +13,8 @@ export const commandGroups: CommandGroup[] = [
 			},
 			{
 				name: 'doctor',
-				usage: 'demo-video doctor',
-				text: 'Lists ffmpeg, ffprobe, Node, Python, the beat tracker, Playwright and the ElevenLabs key as found or missing, with the command or file that fixes each missing one. Exits non-zero when something is missing.'
+				usage: 'demo-video doctor [project]',
+				text: 'Lists ffmpeg, ffprobe, Node, Python, the beat tracker, Playwright and the ElevenLabs key as found or missing (with a project, its .el-key counts too), with the command or file that fixes each missing one. Exits non-zero when something is missing.'
 			},
 			{ name: '--version', usage: 'demo-video --version', text: 'Prints demo-video and its version.' },
 			{ name: 'help', usage: 'demo-video --help', text: 'Lists every command.' }
@@ -101,7 +101,7 @@ export const commandGroups: CommandGroup[] = [
 				name: 'theme',
 				usage: 'demo-video theme <name> [project]',
 				text: 'Renders a theme’s cards, end card, key hint and splash with a contact sheet, in a few seconds and with no recording. With a project, it uses that project’s words and keys.',
-				writes: 'build/themes/<name>/'
+				writes: './build/themes/<name>/, or <project>/build/themes/<name>-<project name>/'
 			}
 		]
 	}
